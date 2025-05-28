@@ -1,0 +1,17 @@
+body {
+    background: linear-gradient(90deg, #192c17, #2b5623, #40842b, #5bb42f, #5bb42f, #40842b, #2b5623, #192c17);
+    color: tomato;
+    font-size: 16pt;
+
+}
+a:link {
+    color: crimson;
+}
+
+a:visited {
+    color: yellow;
+}
+
+.thanks {
+    text-align: center;
+}
