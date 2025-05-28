@@ -16,3 +16,16 @@ def thanks(request):
     'services': services,
     }
     return render(request, 'thanks.html', context)
+
+def orders_list(request):
+    context = {
+        "orders" : orders
+    }
+    return render(request, "orders.html", context)
+
+def order_detail(request, order_id):
+    order = [order for order in orders if order['id']== order_id][0]
+    context = {
+        "order": order
+    }
+    return render(request, 'orders_detail.html', context)

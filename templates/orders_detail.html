@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+    <h2>Детали заказа</h2>
+    
+    {% for key, value in order.items %}
+        <p><strong>{{ key }}:</strong> {{ value }}</p>
+    {% endfor %}
+    
+    <a href="{% url 'orders_list' %}">Назад к списку заказов</a>
+{% endblock content %}
+
