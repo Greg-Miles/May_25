@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    {% for master in masters %}
+        <p>
+            <img src={% static  master.photo  %} alt="{{ master.name }}">
+            Мастер: {{ master.name }} <br>
+            
+        </p>
+    {% endfor %}
+    <a href="/">Назад</a>
+{% endblock content %}

@@ -29,3 +29,9 @@ def order_detail(request, order_id):
         "order": order
     }
     return render(request, 'orders_detail.html', context)
+
+def masters_list(request):
+    context = {
+        "masters": masters
+    }
+    return render(request, 'masters_list.html', context)

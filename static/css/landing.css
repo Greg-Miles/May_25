@@ -2,8 +2,13 @@ body {
     background: linear-gradient(90deg, #192c17, #2b5623, #40842b, #5bb42f, #5bb42f, #40842b, #2b5623, #192c17);
     color: tomato;
     font-size: 16pt;
-
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
+
 a:link {
     color: crimson;
 }
@@ -14,4 +19,35 @@ a:visited {
 
 .thanks {
     text-align: center;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
+}
+
+header nav {
+    width: 100%;
+    text-align: center;
+}
+
+main {
+    flex: 1;
+    text-align: center;
+    padding: 20px;
+}
+
+footer {
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+}
+
+footer > p {
+    text-align: center;
+    font-size: 12pt;
+    margin: 5px 0;
 }
