@@ -12,6 +12,7 @@ def landing(request):
     context = {
         'masters': masters,
         'services': services,
+        "title": title
     }
     return render(request, "landing.html", context)
 

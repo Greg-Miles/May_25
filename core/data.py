@@ -110,3 +110,6 @@ orders = [
         "status": STATUS_COMPLETED
     }
 ]
+
+# Назваание конторы
+title = 'Барбершоп "Горшок"'
