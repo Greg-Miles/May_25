@@ -1,6 +1,8 @@
 body {
-    background: linear-gradient(90deg, #192c17, #2b5623, #40842b, #5bb42f, #5bb42f, #40842b, #2b5623, #192c17);
-    color: tomato;
+    background-image: url('/static/img/background.webp');
+    background-size: cover;
+    font-family: "Ponomar", system-ui;
+    color: white;
     font-size: 16pt;
     margin: 0;
     padding: 0;
@@ -19,6 +21,7 @@ a:visited {
 
 .thanks {
     text-align: center;
+    background-color: grey;
 }
 
 header {
@@ -50,4 +53,27 @@ footer > p {
     text-align: center;
     font-size: 10pt;
     margin: 5px 0;
+}
+
+.ponomar-regular {
+  font-family: "Ponomar", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.master-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: dimgray;
+    border-radius: 10px;
+    box-shadow: 10px 10px 5px black;
+}
+.master-card>p {
+    margin: 5px;
 }

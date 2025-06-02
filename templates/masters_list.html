@@ -2,11 +2,10 @@
 {% load static %}
 {% block content %}
     {% for master in masters %}
-        <p>
+        <div class="container master-card">     
             <img src={% static  master.photo  %} alt="{{ master.name }}">
-            Мастер: {{ master.name }} <br>
-            
-        </p>
+            <p>Мастер: {{ master.name }} </p>
+        </div>
     {% endfor %}
     <a href="/">Назад</a>
 {% endblock content %}
