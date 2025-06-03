@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import HttpResponseNotFound
 from core.data import *
 
 # Create your views here.
@@ -47,8 +48,16 @@ def order_detail(request, order_id: int):
     :returns render: Рендер главной страницы, модифицированный для показа данных о конкретной записи
     """
     order = [order for order in orders if order['id']== order_id][0]
+    if not order:
+        return HttpResponseNotFound("Заказ не найден")
+    master_name = "Мастер не назначен"
+    for master in masters:
+        if master["id"] == order["master_id"]:
+            master_name = master["name"]
+            break
     context = {
-        "order": order
+        "order": order,
+        "master_name": master_name,
     }
     return render(request, 'orders_detail.html', context)
 
@@ -62,3 +71,15 @@ def masters_list(request):
         "masters": masters
     }
     return render(request, 'masters_list.html', context)
+
+def services_list(request):
+    """
+    Представление для просмотра всех услуг барбершопа.
+    :param request: запрос
+    :returns render: Рендер страницы со списком всех услуг.
+    """
+    context = {
+        "services": services,
+        "title": "Наши услуги"
+    }
+    return render(request, "services_list.html", context)

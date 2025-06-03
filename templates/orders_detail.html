@@ -1,11 +1,29 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-    <h2>Детали заказа</h2>
-    
-    {% for key, value in order.items %}
-        <p><strong>{{ key }}:</strong> {{ value }}</p>
-    {% endfor %}
-    
+    <div class="container order-card">
+        <h2>Детали заказа:</h2>
+        <div>
+            <li><strong>Номер заказа:</strong> {{order.id}} </li>
+            <li><strong>Имя клиента:</strong> {{order.client_name}} </li>
+            <li><strong>Услуги:</strong> {{order.services|join:", "}} </li>
+            <li><strong>Мастер:</strong> {{master_name}} </li>
+            <li><strong>Дата:</strong> <i class="bi bi-calendar-event"></i> {{order.date}} </li>
+            <li><strong>Статус:</strong> 
+                {% if order.status == 'новая' %}
+                    <span class="badge bg-primary">Новая</span>
+                {% elif order.status == 'подтвержденная' %}
+                    <span class="badge bg-success">Падтверждённая</span>
+                {% elif order.status == 'отмененная' %}
+                    <span class="badge bg-danger">Отменённая</span>
+                {% elif order.status == 'выполненная'%}
+                    <span class="badge bg-info">Выполненная</span>
+                {% else %}
+                    <span class="badge bg-secondary">Неизвестный статус</spand>
+                {% endif %}
+            </li>
+        </div>
+    </div>
     <a href="{% url 'orders_list' %}">Назад к списку заказов</a>
 {% endblock content %}
 
