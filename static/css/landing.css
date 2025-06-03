@@ -100,3 +100,8 @@ footer > p {
 .order-card>div>li>strong {
     color: yellow;
 }
+
+#about_us {
+    color: yellow;
+    padding: 20px;
+}

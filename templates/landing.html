@@ -1,5 +1,23 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
+    <section id="about_us">
+        <h1>О нас</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <img src={% static 'img/interior.webp' %} alt="" class="img-fluid rounded">
+            </div>
+            <div class="col-md-4">
+                <p>
+                    Нужен ирокез к концерту любимой группы?
+                    Байк-сезон вот-вот начнётся, а лысина потускнела и не блестит?
+                    Девственницы отказываются расчесать твою бороду?
+                    Мы поможем!
+                    Барбершоп "Горшок" - стрижки под горшок и как у Горшка!
+                </p>
+            </div>
+        </div>
+    </section>
     <button>
         Записаться
     </button>
