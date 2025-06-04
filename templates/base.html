@@ -30,20 +30,9 @@
 </head>
 <body>
     <header>
-        <nav aria-label="breadcrumb">
-            {% block header %}
-            <p>Навигация</p>
-            <div>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href={% url 'landing'%}>Главная</a></li>
-                <li class="breadcrumb-item"><a href={% url 'orders_list'%}>Все заявки</a></li>
-                <li class="breadcrumb-item"><a href={% url "masters" %}>Наши мастера</a></li>
-                <li class="breadcrumb-item"><a href={% url 'services_list' %}>Наши услуги</a></li>    
-                <li class="breadcrumb-item"><a href= {% url 'contacts' %} >Наши контакты</a></li>
-            </ol>
-            </div>
-            {% endblock header %}
-        </nav>
+        {% block header %}
+            {% include "menu.html" %}
+        {% endblock header %}
     </header>
     <main>
         <p>Добро пожаловать нашу цирюльню</p>

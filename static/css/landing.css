@@ -105,3 +105,15 @@ footer > p {
     color: yellow;
     padding: 20px;
 }
+
+.make_appointment_btn {
+    background-color: gold;
+    color: black;
+    width: 300px;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16pt;
+    transition: background-color 0.3s ease;
+}
