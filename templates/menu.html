@@ -1,12 +1,30 @@
-<nav aria-label="breadcrumb">
-    <p>Навигация</p>
-    <div>
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href={% url 'landing'%}>Главная</a></li>
-        <li class="breadcrumb-item"><a href={% url 'orders_list'%}>Все заявки</a></li>
-        <li class="breadcrumb-item"><a href={% url "masters" %}>Наши мастера</a></li>
-        <li class="breadcrumb-item"><a href={% url 'services_list' %}>Наши услуги</a></li>    
-        <li class="breadcrumb-item"><a href= {% url 'contacts' %} >Наши контакты</a></li>
-    </ol>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'landing' %}#">Барбершоп "Горшок"</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'landing' %}#about_us">Главная</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'landing' %}#masters">Наши мастера</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'landing' %}#services_list">Наши услуги</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'landing' %}#contacts">Наши контакты</a>
+        </li>
+      </ul>
+      
+      <!-- Separated orders_list link -->
+      <div class="d-flex">
+        <a class="btn btn-outline-primary" href="{% url 'orders_list' %}">Все заявки</a>
+      </div>
     </div>
+  </div>
 </nav>

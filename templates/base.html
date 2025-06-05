@@ -35,9 +35,11 @@
         {% endblock header %}
     </header>
     <main>
-        <p>Добро пожаловать нашу цирюльню</p>
+        <h1>Добро пожаловать в нашу цирюльню!</h1>
         <div class="container">
             {% block content %}
+                {% include "landing.html" %}
+
             {% endblock content %}
         </div>
     </main>

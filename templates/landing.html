@@ -10,7 +10,7 @@
             <div class="col-md-4">
                 <p>
                     Нужен ирокез к концерту любимой группы?
-                    Байк-сезон вот-вот начнётся, а лысина потускнела и не блестит?
+                    Байк-сезон вот-вот начнётся, твой байк блестит, а лысина - нет?
                     Девственницы отказываются расчесать твою бороду?
                     Мы поможем!
                     Барбершоп "Горшок" - стрижки под горшок и как у Горшка!
@@ -21,5 +21,66 @@
     <button class="btn make_appointment_btn">
         Записаться
     </button>
+    <section id="masters">
+        <h4>Наши мастера</h4>
+        {% for master in masters %}
+        <div class="container master-card">     
+            <img src={% static  master.photo  %} alt="{{ master.name }}">
+            <p>Мастер: {{ master.name }} </p>
+        </div>
+    {% endfor %}
+    <a href="#about_us">Назад</a>
+    </section>
+    <section id="services_list">
+        <div class="container">
+            <h4 class="mb-4">Наши услуги</h4>
+            <table class="table table-striped table-hover" >
+                <thead>
+                    <tr>
+                        <th scope="col">Услуга</th>
+                        <th scope="col">Цена (руб.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                        <tr>
+                            <td>{{ service.name }}</td>
+                            <td>{{ service.price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        <a href="#about_us">Назад</a>
+
+    </div>
+    </section>
+    <section id="contacts">
+        <div class="card">
+            <h4 class="card-tile">
+                Наши контакты:
+            </h4>
+            <div class="card-body">
+                <p class="card-text">
+                    <i class="bi bi-house"></i> Адрес: г. Москва, Пампуш на Твербуле.
+                    <br>
+                    <i class="bi bi-telephone"></i> Телефон: +7 (999) 999-99-99
+                    <br>
+                    <i class="bi bi-envelope"></i> Email: barbershop@gmail.com
+                    <br>
+                    <i class="bi bi-telegram"></i> Telegram: @barbershop
+                    <br>
+                    <i class="bi bi-clock"></i> Время работы: Пн-Пт: 10:00 - 20:00
+                    <br>
+                    <i class="bi bi-clock"></i> Сб-Вс: 10:00 - 18:00
+                    <br>
+
+
+                </p>
+            </div>
+        </div>
+        <a href="#about_us">Назад</a>
+    </section>
+
 {% endblock content %}
 
