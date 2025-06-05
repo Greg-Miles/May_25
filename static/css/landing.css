@@ -26,18 +26,6 @@ a:visited {
     background-color: grey;
 }
 
-nav {
-    position: fixed;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    justify-content: start;
-    width: 100%;
-    text-align: center;
-    font-size: 12pt;
-}
-
 
 
 main {

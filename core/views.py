@@ -60,34 +60,3 @@ def order_detail(request, order_id: int):
         "master_name": master_name,
     }
     return render(request, 'orders_detail.html', context)
-
-def masters_list(request):
-    """
-    Представление для списка всех мастеров.
-    :param request: запрос
-    :returns render: Рендер главной страницы, модифицированный для показа списка всех мастеров с их фото.
-    """
-    context = {
-        "masters": masters
-    }
-    return render(request, 'masters_list.html', context)
-
-def services_list(request):
-    """
-    Представление для просмотра всех услуг барбершопа.
-    :param request: запрос
-    :returns render: Рендер страницы со списком всех услуг.
-    """
-    context = {
-        "services": services,
-        "title": "Наши услуги"
-    }
-    return render(request, "services_list.html", context)
-
-def contacts(request):
-    """
-    Представление для страницы с контактами.
-    :param request: запрос
-    :returns render: Рендер страницы с контактами.
-    """
-    return render(request, "contacts.html")
