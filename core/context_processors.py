@@ -13,6 +13,8 @@ def page_titles(request):
         'masters': 'Наши мастера',
         'services_list': 'Услуги',
         'contacts': 'Контакты',
+        'order_detail': 'Заявка',
+        'thanks': 'Спасибо!'
         # Добавьте другие URL-имена и соответствующие заголовки
     }
     

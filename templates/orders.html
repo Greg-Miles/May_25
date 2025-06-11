@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
     {% for order in orders %}
-        <p>
-            Клиент: {{ order.client_name }} <br>
-            Статус: {{ order.status }} <br>
-            <a href="{% url 'order_detail' order.id %}">Подробнее</a>
-        </p>
+        {% include "order_detail_partial.html" %}
     {% endfor %}
     <a href="/">Назад</a>
 {% endblock content %}
-
+{% block footer %}
+    {% include "footer.html" %}
+{% endblock footer %}

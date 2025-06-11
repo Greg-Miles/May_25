@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from core.data import *
+from core.models import User
 
 # Create your views here.
 
@@ -13,7 +14,8 @@ def landing(request):
     context = {
         'masters': masters,
         'services': services,
-        "title": title
+        "title": title,
+        "user" : User,
     }
     return render(request, "landing.html", context)
 
@@ -26,6 +28,7 @@ def thanks(request):
     context = {
     'masters': masters,
     'services': services,
+    "user" : User,
     }
     return render(request, 'thanks.html', context)
 
@@ -36,7 +39,8 @@ def orders_list(request):
     :returns render: Рендер главной страницы, модифицированный для показа всех записей.
     """
     context = {
-        "orders" : orders
+        "orders" : orders,
+        "user" : User,
     }
     return render(request, "orders.html", context)
 
@@ -58,5 +62,6 @@ def order_detail(request, order_id: int):
     context = {
         "order": order,
         "master_name": master_name,
+        "user" : User,
     }
     return render(request, 'orders_detail.html', context)

@@ -20,9 +20,8 @@
 
     {% endblock styles%}
 
-    <script src="/static/js/landing.js"></script>
-
     {% block scripts %}
+        <script src="{% static 'js/landing.js' %}"></script>
     {% endblock scripts %}
 
     {% block extra_head %}
@@ -35,9 +34,11 @@
         {% endblock header %}
     </header>
     <main>
-        <h1>Добро пожаловать в нашу цирюльню!</h1>
+        
         <div class="container">
+            
             {% block content %}
+                
                 {% include "landing.html" %}
 
             {% endblock content %}
@@ -45,8 +46,7 @@
     </main>
     <footer>
         {% block footer %}
-            <p>Домашняя работа №21</p>
-            <p>Дизайнерское агентство "Вырви глаз" 2025 &copy; Никакие права не защищены</p>
+            {% include "footer.html" %}
         {% endblock footer %}
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
