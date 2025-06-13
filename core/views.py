@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from core.data import *
-from core.models import User
+from django.contrib.auth.models import User
 
 # Create your views here.
 
