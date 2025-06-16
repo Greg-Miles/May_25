@@ -5,17 +5,28 @@
     <div class="card-body">
         <li><strong>Номер заказа:</strong> {{order.id}} </li>
         <li><strong>Имя клиента:</strong> {{order.client_name}} </li>
-        <li><strong>Услуги:</strong> {{order.services|join:", "}} </li>
-        <li><strong>Мастер:</strong> {{master_name}} </li>
-        <li><strong>Дата:</strong> <i class="bi bi-calendar-event"></i> {{order.date}} </li>
+        <li><strong>Услуги:</strong>
+            {% for service in order.services.all %}
+                {{ service.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %} </li>
+        <li><strong>Мастер:</strong>
+             {% if order.master %}
+                {{ order.master.name }}
+            {% else %}
+                Мастер не назначен
+            {% endif %} 
+        </li>
+        <li><strong>Дата:</strong> <i class="bi bi-calendar-event"></i> {{order.appointment_date}} </li>
         <li><strong>Статус:</strong> 
-            {% if order.status == 'новая' %}
+            {% if order.status == 'not_approved' %}
                 <span class="badge bg-primary">Новая</span>
-            {% elif order.status == 'подтвержденная' %}
-                <span class="badge bg-success">Падтверждённая</span>
-            {% elif order.status == 'отмененная' %}
+            {% elif order.status == 'approved' %}
+                <span class="badge bg-success">Подтверждённая</span>
+            {% elif order.status == 'in_progress' %}
+                <span class="badge bg-warning">В процессе</span>
+            {% elif order.status == 'canceled' %}
                 <span class="badge bg-danger">Отменённая</span>
-            {% elif order.status == 'выполненная'%}
+            {% elif order.status == 'done' %}
                 <span class="badge bg-info">Выполненная</span>
             {% else %}
                 <span class="badge bg-secondary">Неизвестный статус</span>

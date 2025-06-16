@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -30,6 +31,7 @@ class Master(models.Model):
     """
     Модель мастера барбершопа.
     """
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='master_profile')
     name = models.CharField(max_length=100, verbose_name="Имя мастера")
     photo = models.ImageField(upload_to="masters/", verbose_name="Фото мастера", blank=True)
     phone = models.CharField(max_length=20, verbose_name="Номер телефона")
