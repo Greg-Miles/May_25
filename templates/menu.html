@@ -21,12 +21,35 @@
         </li>
       </ul>
       
-      {% if user.is_staff %}
+      {% if request.user.is_staff %}
       <div class="d-flex">
         <a class="btn btn-outline-primary" href="{% url 'orders_list' %}">Все заявки</a>
     
       </div>
       {% endif %}
+      <ul class="navbar-nav ml-auto">
+          {% if request.user.is_authenticated %}
+              <li class="nav-item">
+                  <span class="nav-link">Привет, {{ user.username }}!</span>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'profile' %}">Профиль</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
+              </li>
+          {% else %}
+            {% if request.path != '/login/' and request.path != '/register/' %}
+              <form class="d-flex flex-lg-row flex-column gap-2" method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <input type="text" name="username" class="form-control form-control-sm me-2" placeholder="Логин" required>
+                <input type="password" name="password" class="form-control form-control-sm me-2" placeholder="Пароль" required>
+                <button type="submit" class="btn btn-sm btn-primary me-2">Войти</button>
+                <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light">Регистрация</a>
+              </form>
+            {% endif %}
+          {% endif %}
+      </ul>
     </div>
   </div>
 </nav>

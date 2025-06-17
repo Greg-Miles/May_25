@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Профиль пользователя</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ user.username }}</h5>
+            <p class="card-text">Email: {{ user.email }}</p>
+            
+            {% if is_master %}
+            <h6>Информация о мастере:</h6>
+            <p>Имя: {{ master.name }}</p>
+            <p>Телефон: {{ master.phone }}</p>
+            <p>Опыт работы: {{ master.experience|default:"Не указан" }} лет</p>
+            <p>Адрес работы: {{ master.address }}</p>
+            {% endif %}
+            
+            {% if user.is_staff and not is_master %}
+            <p>Вы администратор системы.</p>
+            {% endif %}
+            
+            {% if not user.is_staff and not is_master %}
+            <p>Вы клиент нашего барбершопа.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
