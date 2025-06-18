@@ -127,11 +127,22 @@ def profile(request):
     is_master = hasattr(request.user, 'master_profile')
     
     context = {
+        'user': request.user,
         'is_master': is_master,
     }
     
     if is_master:
-        context['master'] = request.user.master_profile
+        master = request.user.master_profile
+        context['master'] = master
+        orders = Order.objects.filter(master=master).order_by('-appointment_date')
+        context['orders'] = orders
+
+        reviews = Review.objects.filter(master=master, is_published=True).order_by('-created_at')
+        context['reviews'] = reviews
+    else:
+        # Если пользователь не мастер, получаем его заказы
+        orders = Order.objects.filter(client_name=request.user.username).order_by('-appointment_date')
+        context['orders'] = orders
     
     return render(request, 'profile.html', context)
 

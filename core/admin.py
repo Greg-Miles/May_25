@@ -2,20 +2,31 @@ from django.contrib import admin
 from .models import Order, Master, Review, Service
 
 class MasterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'is_active')
-    search_fields = ('name', 'phone')
+    list_display = ('name', 'user', 'phone', 'experience', 'is_active')
     list_filter = ('is_active',)
+    search_fields = ('name', 'phone')
+    filter_horizontal = ('services',)
     
-    def save_model(self, request, obj, form, change):
-        # Если мастер связан с пользователем, делаем этого пользователя staff
-        if obj.user and not obj.user.is_staff:
-            obj.user.is_staff = True
-            obj.user.save()
-        super().save_model(request, obj, form, change)
+    # Добавляем возможность фильтровать по связанному пользователю
+    raw_id_fields = ('user',)
 
-# Register your models here.
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('client_name', 'appointment_date', 'master', 'status')
+    list_filter = ('status', 'master')
+    search_fields = ('client_name', 'phone')
+    filter_horizontal = ('services',)
 
-admin.site.register(Order)
-admin.site.register(Master)
-admin.site.register(Review)
-admin.site.register(Service)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('client_name', 'master', 'rating', 'created_at', 'is_published')
+    list_filter = ('rating', 'is_published', 'master')
+    search_fields = ('client_name', 'text')
+
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'duration', 'is_popular')
+    list_filter = ('is_popular',)
+    search_fields = ('name', 'description')
+
+admin.site.register(Order, OrderAdmin)
+admin.site.register(Master, MasterAdmin)
+admin.site.register(Review, ReviewAdmin)
+admin.site.register(Service, ServiceAdmin)

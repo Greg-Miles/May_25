@@ -1,27 +1,211 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <h2>Профиль пользователя</h2>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ user.username }}</h5>
-            <p class="card-text">Email: {{ user.email }}</p>
-            
+<div class="container mt-5 pt-5">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Профиль пользователя</h3>
+                </div>
+                <div class="card-body">
+                    <h4>{{ user.username }}</h4>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                    
+                    {% if is_master %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-scissors"></i> Вы зарегистрированы как мастер
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
             {% if is_master %}
-            <h6>Информация о мастере:</h6>
-            <p>Имя: {{ master.name }}</p>
-            <p>Телефон: {{ master.phone }}</p>
-            <p>Опыт работы: {{ master.experience|default:"Не указан" }} лет</p>
-            <p>Адрес работы: {{ master.address }}</p>
-            {% endif %}
-            
-            {% if user.is_staff and not is_master %}
-            <p>Вы администратор системы.</p>
-            {% endif %}
-            
-            {% if not user.is_staff and not is_master %}
-            <p>Вы клиент нашего барбершопа.</p>
+                <!-- Информация о мастере -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>Информация о мастере</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% if master.photo %}
+                                    <img src="{{ master.photo.url }}" alt="{{ master.name }}" class="img-fluid rounded">
+                                {% else %}
+                                    <div class="text-center p-4 bg-light rounded">
+                                        <i class="bi bi-person-circle" style="font-size: 5rem;"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <h4>{{ master.name }}</h4>
+                                <p><strong>Телефон:</strong> {{ master.phone }}</p>
+                                <p><strong>Адрес:</strong> {{ master.address }}</p>
+                                <p><strong>Опыт работы:</strong> {{ master.experience }} лет</p>
+                                <p><strong>Статус:</strong> 
+                                    {% if master.is_active %}
+                                        <span class="badge bg-success">Активен</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Неактивен</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mt-3">Услуги:</h5>
+                        <ul class="list-group">
+                            {% for service in master.services.all %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    {{ service.name }}
+                                    <span class="badge bg-primary rounded-pill">{{ service.price }} руб.</span>
+                                </li>
+                            {% empty %}
+                                <li class="list-group-item">Нет доступных услуг</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Предстоящие записи -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h3>Предстоящие записи</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Клиент</th>
+                                        <th>Дата и время</th>
+                                        <th>Услуги</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                        <tr>
+                                            <td>{{ order.client_name }}</td>
+                                            <td>{{ order.appointment_date|date:"d.m.Y H:i" }}</td>
+                                            <td>
+                                                {% for service in order.services.all %}
+                                                    {{ service.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% if order.status == 'not_approved' %}
+                                                    <span class="badge bg-warning">Новая</span>
+                                                {% elif order.status == 'approved' %}
+                                                    <span class="badge bg-primary">Подтверждена</span>
+                                                {% elif order.status == 'in_progress' %}
+                                                    <span class="badge bg-info">В процессе</span>
+                                                {% elif order.status == 'done' %}
+                                                    <span class="badge bg-success">Выполнена</span>
+                                                {% elif order.status == 'canceled' %}
+                                                    <span class="badge bg-danger">Отменена</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">Нет предстоящих записей</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Отзывы о мастере -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Отзывы клиентов</h3>
+                    </div>
+                    <div class="card-body">
+                        {% for review in reviews %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <h5 class="card-title">{{ review.client_name }}</h5>
+                                        <div>
+                                            {% for i in "12345" %}
+                                                {% if forloop.counter <= review.rating %}
+                                                    <i class="bi bi-star-fill text-warning"></i>
+                                                {% else %}
+                                                    <i class="bi bi-star text-warning"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <p class="card-text">{{ review.text }}</p>
+                                    <p class="card-text"><small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small></p>
+                                    {% if review.photo %}
+                                        <img src="{{ review.photo.url }}" alt="Фото к отзыву" class="img-fluid rounded mb-2" style="max-height: 200px;">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p class="text-center">Пока нет отзывов</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <!-- Информация для обычного пользователя -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Ваши записи</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Дата и время</th>
+                                        <th>Мастер</th>
+                                        <th>Услуги</th>
+                                        <th>Статус</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in client_orders %}
+                                        <tr>
+                                            <td>{{ order.appointment_date|date:"d.m.Y H:i" }}</td>
+                                            <td>{{ order.master.name|default:"Не назначен" }}</td>
+                                            <td>
+                                                {% for service in order.services.all %}
+                                                    {{ service.name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </td>
+                                            <td>
+                                                {% if order.status == 'not_approved' %}
+                                                    <span class="badge bg-warning">Новая</span>
+                                                {% elif order.status == 'approved' %}
+                                                    <span class="badge bg-primary">Подтверждена</span>
+                                                {% elif order.status == 'in_progress' %}
+                                                    <span class="badge bg-info">В процессе</span>
+                                                {% elif order.status == 'done' %}
+                                                    <span class="badge bg-success">Выполнена</span>
+                                                {% elif order.status == 'canceled' %}
+                                                    <span class="badge bg-danger">Отменена</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center">У вас пока нет записей</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{% url 'landing' %}" class="btn btn-primary">Записаться на услугу</a>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>
