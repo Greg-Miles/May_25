@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import UserRegistrationForm, LoginForm
@@ -12,7 +13,7 @@ def is_staff(user):
     :param user: пользователь
     :returns bool: True, если пользователь мастер, иначе False
     """
-    return user.is_authenticated and user.is_staff
+    return user.is_staff
 
 # Create your views here.
 
@@ -113,8 +114,9 @@ def user_login(request):
             # Если форма невалидна, добавляем сообщение об ошибке
             messages.error(request, 'Неверное имя пользователя или пароль.')
             # Если запрос был отправлен из меню, перенаправляем на главную
-            if request.META.get('HTTP_REFERER') and 'login' not in request.META.get('HTTP_REFERER'):
-                return redirect(request.META.get('HTTP_REFERER'))
+            if'login' not in request.path:
+                referer = request.META.get('HTTP_REFERER', 'landing')
+                return redirect(referer)
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
