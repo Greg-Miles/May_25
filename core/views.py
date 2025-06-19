@@ -3,7 +3,7 @@ from django.http import HttpResponseNotFound
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import UserRegistrationForm, LoginForm, OrderForm
+from .forms import UserRegistrationForm, LoginForm, OrderForm, ReviewForm
 from core.models import *
 from django.contrib.auth.models import User
 
@@ -190,14 +190,41 @@ def make_order(request, master_id=None):
 
 def master_detail(request, master_id):
     """
-    Представление для просмотра деталей мастера.
+    Представление для просмотра деталей мастера и добавления отзывов.
     """
     master = get_object_or_404(Master, id=master_id)
     services = Service.objects.filter(masters=master)
-    orders = Order.objects.filter(master=master)
+    
+    # Get published reviews for this master
+    reviews = Review.objects.filter(master=master, is_published=True,).order_by('-created_at')[:5]
+    
+    # Handle review submission
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.master = master
+            
+            # Set the client name based on authentication status
+            if request.user.is_authenticated:
+                review.client_name = request.user.username
+            else:
+                review.client_name = "Гость"
+                
+            # Set review as unpublished until approved (optional)
+            review.is_published = False
+            
+            review.save()
+            messages.success(request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
+            return redirect('master_detail', master_id=master_id)
+    else:
+        form = ReviewForm()
+    
     context = {
         'master': master,
         'services': services,
-        'orders': orders,
+        'reviews': reviews,
+        'form': form,
     }
+    
     return render(request, 'master_detail.html', context)

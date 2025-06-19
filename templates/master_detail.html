@@ -30,6 +30,57 @@
             </tbody>
         </table>
     </div>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-4">Отзывы</h4>
+            </div>
+            <div class="card-body">
+                {% if reviews %}
+                    {% for review in reviews %}
+                        <div class="review mb-4 p-3 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ review.client_name }}</h5>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= review.rating %}
+                                            <span class="text-warning">★</span>
+                                        {% else %}
+                                            <span class="text-muted">☆</span>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="text-muted small">{{ review.created_at|date:"d.m.Y H:i" }}</p>
+                            <p>{{ review.text }}</p>
+                        </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-center text-muted">Пока нет отзывов. Будьте первым, кто оставит отзыв!</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-footer">
+            <h5 class="mt-5">Оставить отзыв</h5>
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.text.id_for_label }}">Ваш отзыв:</label>
+                    {{ form.text }}
+                    {{ form.text.errors }}
+                </div>
+                
+                <div class="form-group mb-3">
+                    <label for="{{ form.rating.id_for_label }}">Оценка:</label>
+                    {{ form.rating }}
+                    {{ form.rating.errors }}
+                </div>
+                
+                <button type="submit" class="btn btn-warning mb-5">Отправить отзыв</button>
+            </form>
+        </div>
+    </div>
     <button class="btn btn-warning make_appointment_with_master" data-url="{% url 'make_order_with_master' master.id %}">
         Записаться
     </button>
