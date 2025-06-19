@@ -25,7 +25,7 @@
     <section id="masters">
         <h4>Наши мастера</h4>
         {% for master in masters %}
-        <div class="container master-card">     
+        <div class="container master-card" data-master-id="{{ master.id }}">     
             <img src={{ master.photo.url  }} alt="{{ master.name }}">
             <p>Мастер: {{ master.name }} </p>
         </div>

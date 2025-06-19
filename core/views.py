@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseNotFound
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -153,7 +153,7 @@ def user_logout(request):
     logout(request)
     return redirect('landing')
 
-def make_order(request):
+def make_order(request, master_id=None):
     """
     Представление для создания заказа.
     """
@@ -170,11 +170,20 @@ def make_order(request):
         initial_data = {}
         if request.user.is_authenticated:
             initial_data['client_name'] = request.user.username
+
+        if master_id:
+            try:
+                master = Master.objects.get(id=master_id)
+                initial_data['master'] = master
+            except Master.DoesNotExist:
+                pass
         form = OrderForm(initial=initial_data)
     masters = Master.objects.all()
+    selected_master_id = int(master_id) if master_id else None
     context = {
         'form': form, 
-        'masters': masters
+        'masters': masters,
+        'selected_master_id': selected_master_id,
         }
     return render(request, 'make_order.html', context)
 
@@ -184,7 +193,11 @@ def master_detail(request, master_id):
     Представление для просмотра деталей мастера.
     """
     master = get_object_or_404(Master, id=master_id)
+    services = Service.objects.filter(masters=master)
+    orders = Order.objects.filter(master=master)
     context = {
         'master': master,
+        'services': services,
+        'orders': orders,
     }
     return render(request, 'master_detail.html', context)

@@ -31,7 +31,10 @@
                             <select name="master" id="id_master" class="form-control" required>
                                 <option value="">-- Выберите мастера --</option>
                                 {% for master in masters %}
-                                <option value="{{ master.id }}">{{ master.name }}</option>
+                                    <option value="{{ master.id }}" 
+                                        {% if selected_master_id == master.id %}selected{% endif %}>
+                                        {{ master.name }}
+                                    </option>
                                 {% endfor %}
                             </select>
                         </div>

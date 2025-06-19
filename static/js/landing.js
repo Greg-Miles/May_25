@@ -2,13 +2,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const appointment = document.querySelector('.make_appointment_btn');
     if (appointment) {
         appointment.addEventListener('click', function() {
-            window.location.href = 'new_order/';
+            const url = this.getAttribute('data-url');
+            window.location.href = url||'/new_order/';
         });
     } else {
         console.error('Кнопки нет.');
     }
+    const appointmentWithMaster = document.querySelector('.make_appointment_with_master');
+    if (appointmentWithMaster) {
+        appointmentWithMaster.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            window.location.href = url;
+        });
+    }
     
-    // Новый код для автоматического закрытия сообщений
+    // Код для автоматического закрытия сообщений
     setTimeout(function() {
         var alerts = document.querySelectorAll('.alert');
         alerts.forEach(function(alert) {
@@ -25,4 +33,26 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }, 5000); // Закрыть через 5 секунд
+
+    // Код для карточек мастеров
+    const masterCards = document.querySelectorAll('.master-card');
+    if (masterCards.length > 0) {
+        masterCards.forEach(function(card) {
+            // Добавляем класс для стилизации при наведении
+            card.classList.add('master-card-hover');
+            
+            // Получаем ID мастера из атрибута data-master-id
+            const masterId = card.getAttribute('data-master-id');
+            
+            // Добавляем обработчик клика
+            card.addEventListener('click', function() {
+                if (masterId) {
+                    window.location.href = `/master/${masterId}/`;
+                }
+            });
+            
+            // Добавляем стиль курсора, чтобы показать, что элемент кликабельный
+            card.style.cursor = 'pointer';
+        });
+    }
 });
