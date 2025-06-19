@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from .models import Service, Order
 
 class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -19,3 +20,14 @@ class UserRegistrationForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     pass
+
+
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['client_name', 'phone', 'master', 'appointment_date', 'services']
+        widgets = {
+            'appointment_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'services': forms.SelectMultiple(attrs={'class': 'form-control'}),
+            'master': forms.Select(attrs={'class': 'form-control'}),
+        }

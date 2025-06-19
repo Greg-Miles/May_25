@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const appointment = document.querySelector('.make_appointment_btn');
     if (appointment) {
         appointment.addEventListener('click', function() {
-            window.location.href = '/thanks';
+            window.location.href = 'new_order/';
         });
     } else {
         console.error('Кнопки нет.');

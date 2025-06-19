@@ -3,7 +3,7 @@ from django.http import HttpResponseNotFound
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import UserRegistrationForm, LoginForm
+from .forms import UserRegistrationForm, LoginForm, OrderForm
 from core.models import *
 from django.contrib.auth.models import User
 
@@ -152,3 +152,39 @@ def user_logout(request):
     """
     logout(request)
     return redirect('landing')
+
+def make_order(request):
+    """
+    Представление для создания заказа.
+    """
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            order = form.save(commit=False)
+            if request.user.is_authenticated:
+                order.client_name = request.user.username
+            order.save()
+            form.save_m2m()
+            return redirect('thanks')
+    else:
+        initial_data = {}
+        if request.user.is_authenticated:
+            initial_data['client_name'] = request.user.username
+        form = OrderForm(initial=initial_data)
+    masters = Master.objects.all()
+    context = {
+        'form': form, 
+        'masters': masters
+        }
+    return render(request, 'make_order.html', context)
+
+
+def master_detail(request, master_id):
+    """
+    Представление для просмотра деталей мастера.
+    """
+    master = get_object_or_404(Master, id=master_id)
+    context = {
+        'master': master,
+    }
+    return render(request, 'master_detail.html', context)
