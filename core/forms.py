@@ -1,9 +1,12 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Service, Order, Review
 
 class UserRegistrationForm(UserCreationForm):
+    """
+    Форма регистрации пользователя.
+    """
     email = forms.EmailField(required=True)
     
     class Meta:
@@ -11,6 +14,9 @@ class UserRegistrationForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
     
     def save(self, commit=True):
+        """
+        Сохраняет пользователя и связывает его с электронной почтой.
+        """
         user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         
@@ -18,11 +24,11 @@ class UserRegistrationForm(UserCreationForm):
             user.save()
         return user
 
-class LoginForm(AuthenticationForm):
-    pass
-
 
 class OrderForm(forms.ModelForm):
+    """
+    Форма для создания заказа.
+    """
     class Meta:
         model = Order
         fields = ['client_name', 'phone', 'master', 'appointment_date', 'services']
@@ -33,6 +39,9 @@ class OrderForm(forms.ModelForm):
         }
 
 class ReviewForm(forms.ModelForm):
+    """
+    Форма для создания отзыва.
+    """
     class Meta:
         model = Review
         fields = ['text', 'rating']

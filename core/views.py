@@ -3,9 +3,11 @@ from django.http import HttpResponseNotFound
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .forms import UserRegistrationForm, LoginForm, OrderForm, ReviewForm
+from django.contrib.auth.forms import AuthenticationForm
+from .forms import UserRegistrationForm, OrderForm, ReviewForm
 from core.models import *
 from django.contrib.auth.models import User
+
 
 def is_staff(user):
     """
@@ -85,6 +87,11 @@ def order_detail(request, order_id: int):
     return render(request, 'orders_detail.html', context)
 
 def register(request):
+    """
+    Представление для регистрации пользователя.
+    :param request: запрос
+    :returns render: Рендер страницы регистрации
+    """
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -95,12 +102,15 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, 'register.html', {'form': form})
 
+
 def user_login(request):
     """
     Представление для входа пользователя.
+    :param request: запрос
+    :returns render: Рендер страницы входа
     """
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
@@ -118,11 +128,16 @@ def user_login(request):
                 referer = request.META.get('HTTP_REFERER', 'landing')
                 return redirect(referer)
     else:
-        form = LoginForm()
+        form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
 
 @login_required
 def profile(request):
+    """
+    Представление для профиля пользователя.
+    :param request: запрос
+    :returns render: Рендер страницы профиля
+    """
     # Проверяем, является ли пользователь мастером
     is_master = hasattr(request.user, 'master_profile')
     
@@ -149,13 +164,19 @@ def profile(request):
 def user_logout(request):
     """
     Представление для выхода пользователя с немедленным перенаправлением на главную страницу.
+    :param request: запрос
+    :returns redirect: Перенаправление на главную страницу
     """
     logout(request)
     return redirect('landing')
 
+
 def make_order(request, master_id=None):
     """
     Представление для создания заказа.
+    :param request: запрос
+    :param master_id: идентификатор мастера (по умолчанию None)
+    :returns render: Рендер страницы создания заказа
     """
     if request.method == 'POST':
         form = OrderForm(request.POST)
@@ -191,6 +212,9 @@ def make_order(request, master_id=None):
 def master_detail(request, master_id):
     """
     Представление для просмотра деталей мастера и добавления отзывов.
+    :param request: запрос
+    :param master_id: идентификатор мастера
+    :returns render: Рендер страницы деталей мастера
     """
     master = get_object_or_404(Master, id=master_id)
     services = Service.objects.filter(masters=master)
