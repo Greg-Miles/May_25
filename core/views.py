@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
+from django.db.models import Q
 from .forms import UserRegistrationForm, OrderForm, ReviewForm
 from core.models import *
 from django.contrib.auth.models import User
@@ -55,10 +56,50 @@ def orders_list(request):
     :param request: запрос
     :returns render: Рендер главной страницы, модифицированный для показа всех записей.
     """
-    context = {
-        "orders" : Order.objects.all(),
-        "masters" : Master.objects.all(),
+    q = request.GET.get("q")
+    search_by_phone = request.GET.get("search_by_phone", "false") == "true"
+    search_by_name  = request.GET.get("search_by_name", "false") == "true"
+    search_by_comment = request.GET.get("search_by_comment", "false") == "true"
 
+    order_by_date = request.GET.get("order_by_date", "desc")
+
+    status_not_approved = request.GET.get("status_not_approved", "false") == "true"
+    status_approved = request.GET.get("status_approved", "false") == "true"
+    status_in_progress = request.GET.get("status_in_progress", "false") == "true"
+    status_done = request.GET.get("status_done", "false") == "true"
+    status_canceled = request.GET.get("status_canceled", "false") == "true"
+
+    query = Order.objects.all()
+
+    base_q = Q()
+
+    if q:
+        if search_by_phone:
+            base_q |= Q(phone__icontains=q)
+        if search_by_name:
+            base_q |= Q(master__name__icontains=q)
+        if search_by_comment:
+            base_q |= Q(comment__icontains=q)
+
+    if order_by_date == "asc":
+        query = query.order_by("date_created")
+    else:
+        query = query.order_by("-date_created")
+
+    if status_not_approved:
+        base_q |= Q(status="not_approved")
+    if status_approved:
+        base_q |= Q(status="approved")
+    if status_in_progress:
+        base_q |= Q(status="in_progress")
+    if status_done:
+        base_q |= Q(status="done")
+    if status_canceled:
+        base_q |= Q(status="canceled")
+    orders = query.filter(base_q)
+    context = {
+        "orders" : orders,
+        "title": 'Список заказов',
     }
     return render(request, "orders.html", context)
 
