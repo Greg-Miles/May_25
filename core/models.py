@@ -36,7 +36,7 @@ class Master(models.Model):
     photo = models.ImageField(upload_to="masters/", verbose_name="Фото мастера", blank=True)
     phone = models.CharField(max_length=20, verbose_name="Номер телефона")
     address = models.CharField(max_length=255, verbose_name="Адрес", default="Не указан")
-    experience = models.PositiveIntegerField(verbose_name="Стаж работы", help_text="Опыт работы в годах", null=True, blank=True)
+    experience = models.PositiveIntegerField(verbose_name="Стаж работы", help_text="Опыт работы в годах", default=0)
     services = models.ManyToManyField("Service", verbose_name="Услуги", related_name="masters")
     is_active = models.BooleanField(default=True, verbose_name="Активен")
 

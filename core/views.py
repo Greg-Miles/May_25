@@ -29,6 +29,7 @@ def landing(request):
     context = {
         'masters': Master.objects.all(),
         'services': Service.objects.all(),
+        'reviews': Review.objects.filter(is_published=True).order_by('-created_at')[:5],
         "title": 'Барбершоп "Горшок"',
 
     }

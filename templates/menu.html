@@ -22,13 +22,13 @@
       </ul>
       
       {% if request.user.is_staff %}
-      <div class="d-flex gap-2">
+      <div class="d-flex gap-2 mx-2" >
         <a class="btn btn-outline-warning" href="{% url 'orders_list' %}">Все заявки</a>
     
       </div>
       {% endif %}
       {% if request.user.is_superuser %}
-        <div class="d-flex gap-2">
+        <div class="d-flex gap-2 mx-2">
         <a class="btn btn-outline-warning" href="{% url 'admin:index' %}">Админка</a>
         </div>
       {% endif %}
@@ -49,7 +49,7 @@
                 {% csrf_token %}
                 <input type="text" name="username" class="form-control form-control-sm me-2" placeholder="Логин" required>
                 <input type="password" name="password" class="form-control form-control-sm me-2" placeholder="Пароль" required>
-                <button type="submit" class="btn btn-sm btn-primary me-2">Войти</button>
+                <button type="submit" class="btn btn-sm btn-warning me-2">Войти</button>
                 <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light">Регистрация</a>
               </form>
             {% endif %}
