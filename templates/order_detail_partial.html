@@ -5,13 +5,15 @@
     <div class="card-body">
         <li><strong>Номер заказа:</strong> {{order.id}} </li>
         <li><strong>Имя клиента:</strong> {{order.client_name}} </li>
+        <li><strong>Телефон:</strong> {{order.phone}} </li>
         <li><strong>Услуги:</strong>
             {% for service in order.services.all %}
                 {{ service.name }}{% if not forloop.last %}, {% endif %}
             {% endfor %} </li>
-        <li><strong>Мастер:</strong>
+        <li>
+            <strong>Мастер:</strong>
              {% if order.master %}
-                {{ order.master.name }}
+                <a href="{% url "master_detail" order.master.id %}">{{ order.master.name }}</a>
             {% else %}
                 Мастер не назначен
             {% endif %} 
