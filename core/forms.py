@@ -44,8 +44,10 @@ class ReviewForm(forms.ModelForm):
     """
     class Meta:
         model = Review
-        fields = ['text', 'rating']
+        fields = ['master','text', 'client_name', 'rating']
         widgets = {
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Напишите отзыв'}),
             'rating': forms.Select(attrs={'class': 'form-control'}),
+            'client_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ваше имя', 'readonly': True}),
+            'master': forms.Select(attrs={'class': 'form-control'}),
         }

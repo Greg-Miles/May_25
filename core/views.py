@@ -294,3 +294,34 @@ def master_detail(request, master_id):
     }
     
     return render(request, 'master_detail.html', context)
+
+
+def make_review(request):
+    """
+    Представление для создания отзыва.
+    :param request: запрос
+    :returns render: Рендер страницы создания отзыва
+    """
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.is_published = False  # Set the review as unpublished until approved
+            review.save()
+            messages.success(request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
+            return redirect('master_detail', master_id=review.master.id)
+    else:
+        form = ReviewForm()
+
+        initial_data = {}
+        if request.user.is_authenticated:
+            initial_data['client_name'] = request.user.username
+        else:
+            initial_data['client_name'] = "Гость"
+        form = ReviewForm(initial=initial_data)
+
+    context = {
+        'form': form,
+    }
+
+    return render(request, 'make_review.html', context)

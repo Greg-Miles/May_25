@@ -53,6 +53,7 @@
                             <div class="review mb-4 p-3 border-bottom">
                                 <div class="d-flex justify-content-between">
                                     <h5>{{ review.client_name }}</h5>
+                                    <p>{{ review.master }}</p>
                                     <div class="rating">
                                         {% for i in "12345" %}
                                             {% if forloop.counter <= review.rating %}
@@ -63,7 +64,8 @@
                                         {% endfor %}
                                     </div>
                                 </div>
-                                <p class="text-muted small">{{ review.created_at|date:"d.m.Y H:i" }}</p>
+                                <p class="text-muted small">
+                                    {{ review.created_at|date:"d.m.Y H:i" }}</p>
                                 <p>{{ review.text }}</p>
                             </div>
                         {% endfor %}
@@ -73,6 +75,7 @@
                 </div>
             </div>
         </div>
+        <a href="review" class="btn btn-warning">Оставить отзыв</a>
     </section>
     <section id="services_list">
         <div class="container landing-section">

@@ -35,4 +35,5 @@ urlpatterns = [
     path('new_order/', make_order, name='make_order'),
     path('new_order/<int:master_id>/', make_order, name='make_order_with_master'),
     path('master/<int:master_id>/', master_detail, name='master_detail'),
+    path('review/', make_review, name='make_review'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
