@@ -55,4 +55,67 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.cursor = 'pointer';
         });
     }
+
+    // Код для динамического обновления списка услуг при выборе мастера
+    const masterSelect = document.getElementById('id_master');
+    const servicesSelect = document.getElementById('id_services');
+    
+    if (masterSelect && servicesSelect) {
+        masterSelect.addEventListener('change', function() {
+            const masterId = this.value;
+            
+            // Очищаем список услуг
+            servicesSelect.innerHTML = '';
+            
+            if (masterId) {
+                // Делаем AJAX запрос для получения услуг мастера
+                fetch(`/get_master_services/?master_id=${masterId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.services && data.services.length > 0) {
+                            data.services.forEach(service => {
+                                const option = document.createElement('option');
+                                option.value = service.id;
+                                option.textContent = `${service.name} - ${service.price} руб.`;
+                                servicesSelect.appendChild(option);
+                            });
+                        } else {
+                            const option = document.createElement('option');
+                            option.value = '';
+                            option.textContent = 'У этого мастера нет доступных услуг';
+                            option.disabled = true;
+                            servicesSelect.appendChild(option);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при загрузке услуг:', error);
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Ошибка загрузки услуг';
+                        option.disabled = true;
+                        servicesSelect.appendChild(option);
+                    });
+            } else {
+                // Если мастер не выбран, показываем сообщение
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Сначала выберите мастера';
+                option.disabled = true;
+                servicesSelect.appendChild(option);
+            }
+        });
+        
+        // Инициализируем список услуг при загрузке страницы
+        if (masterSelect.value) {
+            masterSelect.dispatchEvent(new Event('change'));
+        } else {
+            // Если мастер не выбран, показываем сообщение
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'Сначала выберите мастера';
+            option.disabled = true;
+            servicesSelect.appendChild(option);
+        }
+    }
+
 });

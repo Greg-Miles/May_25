@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound
+from django.http import HttpResponseNotFound, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -213,6 +213,21 @@ def user_logout(request):
     return redirect('landing')
 
 
+def get_master_services(request):
+    """
+    AJAX представление для получения услуг мастера.
+    """
+    master_id = request.GET.get('master_id')
+    if master_id:
+        try:
+            master = Master.objects.get(id=master_id)
+            services = master.services.all()
+            services_data = [{'id': service.id, 'name': service.name, 'price': service.price} for service in services]
+            return JsonResponse({'services': services_data})
+        except Master.DoesNotExist:
+            return JsonResponse({'services': []})
+    return JsonResponse({'services': []})
+
 def make_order(request, master_id=None):
     """
     Представление для создания заказа.
@@ -221,7 +236,7 @@ def make_order(request, master_id=None):
     :returns render: Рендер страницы создания заказа
     """
     if request.method == 'POST':
-        form = OrderForm(request.POST)
+        form = OrderForm(request.POST, master_id=master_id)
         if form.is_valid():
             order = form.save(commit=False)
             if request.user.is_authenticated:
@@ -240,7 +255,8 @@ def make_order(request, master_id=None):
                 initial_data['master'] = master
             except Master.DoesNotExist:
                 pass
-        form = OrderForm(initial=initial_data)
+        form = OrderForm(initial=initial_data, master_id=master_id)
+    
     masters = Master.objects.all()
     selected_master_id = int(master_id) if master_id else None
     context = {

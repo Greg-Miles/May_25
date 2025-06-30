@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Service, Order, Review
+from .models import Service, Order, Review, Master
 
 class UserRegistrationForm(UserCreationForm):
     """
@@ -31,12 +31,35 @@ class OrderForm(forms.ModelForm):
     """
     class Meta:
         model = Order
-        fields = ['client_name', 'phone', 'master', 'appointment_date', 'services']
+        fields = ['client_name', 'phone', 'master', 'appointment_date', 'services', 'comment']
         widgets = {
             'appointment_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'services': forms.SelectMultiple(attrs={'class': 'form-control'}),
-            'master': forms.Select(attrs={'class': 'form-control'}),
+            'services': forms.SelectMultiple(attrs={
+                'class': 'form-control',
+                "id": "id_services",
+                }),
+            'master': forms.Select(attrs={
+                'class': 'form-control',
+                'id': 'id_master',
+                }),
+            'client_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ваше имя'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер телефона'}),
+            "comment": forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Комментарий (необязательно)'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        master_id = kwargs.pop('master_id', None)
+        super().__init__(*args, **kwargs)
+        
+        if master_id:
+            try:
+                master = Master.objects.get(id=master_id)
+                self.fields['services'].queryset = master.services.all()
+            except Master.DoesNotExist:
+                self.fields['services'].queryset = Service.objects.none()
+        else:
+            # Если мастер не выбран, показываем все услуги
+            self.fields['services'].queryset = Service.objects.all()
 
 class ReviewForm(forms.ModelForm):
     """

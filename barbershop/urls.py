@@ -32,8 +32,9 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
     path('profile/', profile, name='profile'),
-    path('new_order/', make_order, name='make_order'),
-    path('new_order/<int:master_id>/', make_order, name='make_order_with_master'),
+    path('order/create/', make_order, name='make_order'),
+    path('order/<int:master_id>/create', make_order, name='make_order_with_master'),
     path('master/<int:master_id>/', master_detail, name='master_detail'),
-    path('review/', make_review, name='make_review'),
+    path('review/create/', make_review, name='make_review'),
+    path('get_master_services/', get_master_services, name='get_master_services'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

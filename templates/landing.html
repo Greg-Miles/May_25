@@ -23,9 +23,9 @@
         </div>
     </section>
 
-    <button class="btn make_appointment_btn">
+    <a href="{% url "make_order" %}" class="btn make_appointment_btn">
         Записаться
-    </button>
+    </a>
     <section id="masters">
         <div class="container landing-section">
             <h4>Наши мастера</h4>
@@ -75,7 +75,9 @@
                 </div>
             </div>
         </div>
-        <a href="review" class="btn btn-warning">Оставить отзыв</a>
+        <a href="{% url "make_review" %}" class="btn btn-warning">
+            Оставить отзыв
+        </a>
     </section>
     <section id="services_list">
         <div class="container landing-section">
