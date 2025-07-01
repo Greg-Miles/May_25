@@ -203,6 +203,31 @@ def profile(request):
     
     return render(request, 'profile.html', context)
 
+# Представление для отмены заказа клиентом (опционально)
+@login_required
+def cancel_my_order(request, order_id):
+    """
+    Представление для отмены своего заказа клиентом.
+    """
+    order = get_object_or_404(Order, id=order_id, client_name=request.user.username)
+    
+    # Проверяем, можно ли отменить заказ (например, только если он еще не в работе)
+    if order.status in ['done', 'canceled']:
+        messages.error(request, 'Этот заказ нельзя отменить.')
+        return redirect('my_order_detail', order_id=order.id)
+    
+    if request.method == 'POST':
+        order.status = 'canceled'
+        order.save()
+        messages.success(request, f'Заказ #{order.id} успешно отменен!')
+        return redirect('my_orders')
+    
+    context = {
+        'order': order,
+        'title': f'Отмена заказа #{order.id}'
+    }
+    return render(request, 'orders/cancel.html', context)
+
 def user_logout(request):
     """
     Представление для выхода пользователя с немедленным перенаправлением на главную страницу.
@@ -226,8 +251,12 @@ def get_master_services(request):
             return JsonResponse({'services': services_data})
         except Master.DoesNotExist:
             return JsonResponse({'services': []})
-    return JsonResponse({'services': []})
+    else:
+        services = Service.objects.all()
+        services_data = [{'id': service.id, 'name': service.name, 'price': service.price} for service in services]
+    return JsonResponse({'services': services_data})
 
+#CREATE - создание заказа
 def make_order(request, master_id=None):
     """
     Представление для создания заказа.
@@ -236,7 +265,7 @@ def make_order(request, master_id=None):
     :returns render: Рендер страницы создания заказа
     """
     if request.method == 'POST':
-        form = OrderForm(request.POST, master_id=master_id)
+        form = OrderForm(request.POST, master_id=master_id, is_staff=request.user.is_staff)
         if form.is_valid():
             order = form.save(commit=False)
             if request.user.is_authenticated:
@@ -263,8 +292,58 @@ def make_order(request, master_id=None):
         'form': form, 
         'masters': masters,
         'selected_master_id': selected_master_id,
+        "action": "create",
+        'title': 'Записаться на услугу',
+        "submit_text": "Записаться",
         }
     return render(request, 'make_order.html', context)
+
+
+# UPDATE - редактирование заказа (только для персонала)
+@login_required
+@user_passes_test(is_staff)
+def update_order(request, order_id):
+    """
+    Представление для редактирования заказа (только для персонала).
+    """
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order, is_staff=request.user.is_staff)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Заказ успешно обновлен!')
+            return redirect('orders_list')
+    else:
+        form = OrderForm(instance=order, is_staff=request.user.is_staff)
+    
+    context = {
+        'form': form, 
+        'order': order,
+        'title': f'Редактирование заказа #{order.id}',
+        'action': 'update',
+        'submit_text': 'Сохранить изменения'
+    }
+    return render(request, 'make_order.html', context)
+
+# DELETE - удаление заказа (только для персонала)
+@login_required
+@user_passes_test(is_staff)
+def delete_order(request, order_id):
+    """
+    Представление для удаления заказа (только для персонала).
+    """
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        order_id_for_message = order.id
+        order.delete()
+        messages.success(request, f'Заказ #{order_id_for_message} успешно удален!')
+        return redirect('orders_list')
+    
+    context = {
+        'order': order,
+        'title': f'Удаление заказа #{order.id}'
+    }
+    return render(request, 'delete_order.html', context)
 
 
 def master_detail(request, master_id):

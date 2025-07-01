@@ -61,8 +61,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const servicesSelect = document.getElementById('id_services');
     
     if (masterSelect && servicesSelect) {
+        // Сохраняем изначально выбранные услуги (для режима редактирования)
+        const initiallySelectedServices = Array.from(servicesSelect.selectedOptions).map(option => option.value);
+        
+        // Функция для фильтрации мастеров по выбранным услугам
+        function filterMasters() {
+            const selectedServices = Array.from(servicesSelect.selectedOptions).map(option => option.value);
+            
+            if (selectedServices.length === 0) {
+                // Если услуги не выбраны, показываем всех мастеров
+                Array.from(masterSelect.options).forEach(option => {
+                    if (option.value) option.style.display = '';
+                });
+                return;
+            }
+            
+            // Проверяем каждого мастера
+            Array.from(masterSelect.options).forEach(option => {
+                if (!option.value) return; // Пропускаем пустой option
+                
+                const masterId = option.value;
+                
+                // AJAX запрос для проверки услуг мастера
+                fetch(`/get_master_services/?master_id=${masterId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const masterServiceIds = data.services.map(s => s.id.toString());
+                        const hasAllServices = selectedServices.every(serviceId => 
+                            masterServiceIds.includes(serviceId)
+                        );
+                        
+                        // Показываем/скрываем мастера в зависимости от наличия услуг
+                        option.style.display = hasAllServices ? '' : 'none';
+                        
+                        // Если выбранный мастер больше не подходит, сбрасываем выбор
+                        if (!hasAllServices && option.selected) {
+                            masterSelect.value = '';
+                        }
+                    })
+                    .catch(error => console.error('Ошибка при проверке услуг мастера:', error));
+            });
+        }
+        
+        // Слушаем изменения в выборе услуг
+        servicesSelect.addEventListener('change', function() {
+            filterMasters();
+        });
+
         masterSelect.addEventListener('change', function() {
             const masterId = this.value;
+            
+            // Сохраняем текущие выбранные услуги
+            const currentlySelectedServices = Array.from(servicesSelect.selectedOptions).map(option => option.value);
             
             // Очищаем список услуг
             servicesSelect.innerHTML = '';
@@ -77,6 +127,13 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const option = document.createElement('option');
                                 option.value = service.id;
                                 option.textContent = `${service.name} - ${service.price} руб.`;
+                                
+                                // Восстанавливаем выбор если услуга была выбрана ранее
+                                if (currentlySelectedServices.includes(service.id.toString()) || 
+                                    initiallySelectedServices.includes(service.id.toString())) {
+                                    option.selected = true;
+                                }
+                                
                                 servicesSelect.appendChild(option);
                             });
                         } else {
@@ -96,20 +153,32 @@ document.addEventListener('DOMContentLoaded', function() {
                         servicesSelect.appendChild(option);
                     });
             } else {
-                // Если мастер не выбран, показываем сообщение
-                const option = document.createElement('option');
-                option.value = '';
-                option.textContent = 'Сначала выберите мастера';
-                option.disabled = true;
-                servicesSelect.appendChild(option);
+                // Если мастер не выбран, показываем все услуги
+                // Делаем запрос для получения всех услуг
+                fetch('/get_master_services/')  // без master_id получаем все услуги
+                    .then(response => response.json())
+                    .then(data => {
+                        // Здесь нужно будет создать endpoint для всех услуг
+                        // Пока что простое решение:
+                        location.reload();
+                    })
+                    .catch(error => {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'Сначала выберите мастера';
+                        option.disabled = true;
+                        servicesSelect.appendChild(option);
+                    });
             }
         });
         
         // Инициализируем список услуг при загрузке страницы
         if (masterSelect.value) {
-            masterSelect.dispatchEvent(new Event('change'));
+            // Не вызываем change event при загрузке, если услуги уже выбраны
+            if (servicesSelect.options.length === 0) {
+                masterSelect.dispatchEvent(new Event('change'));
+            }
         } else {
-            // Если мастер не выбран, показываем сообщение
             const option = document.createElement('option');
             option.value = '';
             option.textContent = 'Сначала выберите мастера';
@@ -117,5 +186,4 @@ document.addEventListener('DOMContentLoaded', function() {
             servicesSelect.appendChild(option);
         }
     }
-
 });

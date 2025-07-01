@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Удаление заказа
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-6">
+            <div class="card bg-dark my-2">
+                <div class="card-header  text-white">
+                    <h3>Удаление заказа #{{ order.id }}</h3>
+                </div>
+                <div class="card-body">
+                    {% include "order_detail_partial.html" %}
+                </div>
+                <div class="card-footer text-muted">
+                    <form method="POST" action="{% url 'delete_order' order_id=order.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                        <a href="{% url 'orders_list' %}" class="btn btn-secondary">Отмена</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
