@@ -27,6 +27,10 @@ class Order(models.Model):
     def __str__(self):
         return  f"{self.client_name} - {self.appointment_date}"
     
+    class Meta:
+        verbose_name = "Запись"
+        verbose_name_plural = "Записи"
+    
 class Master(models.Model):
     """
     Модель мастера барбершопа.
@@ -42,6 +46,10 @@ class Master(models.Model):
 
     def __str__(self):
         return f"Мастер {self.name}"
+    
+    class Meta:
+        verbose_name = "Мастер"
+        verbose_name_plural = "Мастера"
     
 class Review(models.Model):
     """
@@ -65,6 +73,10 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Отзыв от {self.client_name} на {self.master.name}"
+    
+    class Meta:
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
 
 
 class Service(models.Model):
@@ -79,3 +91,8 @@ class Service(models.Model):
 
     def __str__(self):
         return f"Услуга: {self.name}"
+    
+
+    class Meta:
+        verbose_name = "Услуга"
+        verbose_name_plural = "Услуги"
