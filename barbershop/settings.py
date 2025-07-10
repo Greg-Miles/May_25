@@ -143,9 +143,29 @@ LOGIN_URL = 'login'  # URL для страницы входа
 
 JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
+    "topmenu_links": [
+        {
+            "name": "Перейти на сайт",
+            "url": "/",            # куда вести
+            "icon": "fas fa-home", # иконка FontAwesome (необязательно)
+            "new_window": False,   # открывать в новом окне?
+        },
+    ],
 }
 
 JAZZMIN_UI_TWEAKS = {
     "theme": "litera",
     "dark_mode_theme": "slate",
+}
+
+MISTRAL_MODERATION_TABLE = {
+    "hate_and_discrimination": 0.5,  # ненависть и дискриминация
+    "sexual": 0.5,  # сексуальный
+    "violence_and_threats": 0.5,  # насилие и угрозы
+    "dangerous_and_criminal_content": 0.5,  # опасный и криминальный контент
+    "selfharm": 0.5,  # самоповреждение
+    "health": 0.5,  # здоровье
+    "financial": 0.5,  # финансовый
+    "law": 0.5,  # закон
+    "pii": 0.5,  # личная информация
 }

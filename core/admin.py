@@ -44,7 +44,7 @@ class ReviewAdmin(admin.ModelAdmin):
     """
     Настройки отображения и фильтрации модели Review в админ-панели.
     """
-    list_display = ('client_name', 'master', 'rating', 'created_at', 'is_published')
+    list_display = ('client_name', 'master', 'rating', 'created_at', 'is_published', 'ai_checked_status')
     list_filter = ('rating', 'is_published', 'master')
     search_fields = ('client_name', 'text')
     actions = ['publish',]

@@ -63,6 +63,13 @@ class Review(models.Model):
         (5, "Отлично"),
     ]
 
+    AI_CHOICES = [
+        ("ai_checked_true", "Одобрено ИИ"),
+        ("ai_cancelled", "Не прошло модерацию"),
+        ("ai_checked_in_progress", "В процессе проверки"),
+        ("ai_checked_false", "Не проверено"),
+    ]
+
     text = models.TextField(verbose_name="Текст отзыва")
     client_name = models.CharField(max_length=100, blank=True, default="Гость", verbose_name="Имя клиента")
     master = models.ForeignKey("Master", on_delete=models.SET_NULL, null=True, verbose_name="Мастер")
@@ -70,6 +77,12 @@ class Review(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     rating = models.PositiveSmallIntegerField(verbose_name="Оценка", choices=RATING_CHOICES, default=5)
     is_published = models.BooleanField(default=False, verbose_name="Опубликован")
+    ai_checked_status = models.CharField(
+        max_length=30,
+        choices=AI_CHOICES,
+        default="ai_checked_false",
+        verbose_name="Статус ИИ",
+    )
 
     def __str__(self):
         return f"Отзыв от {self.client_name} на {self.master.name}"
