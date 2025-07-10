@@ -1,9 +1,9 @@
-from pathlib import Path
+
 from mistralai import Mistral
-from barbershop.settings import MISTRAL_MODERATION_TABLE
-from .utils import MISTRAL_MODERATION_KEY
+from barbershop.settings import MISTRAL_MODERATION_TABLE, MISTRAL_MODERATION_KEY
+# from .utils import MISTRAL_MODERATION_KEY
 import os
-from dotenv import load_dotenv
+
 from pprint import pprint
 
 
@@ -19,6 +19,7 @@ def is_good_review(text: str, api_key:str=MISTRAL_MODERATION_KEY, grades: dict =
     :param grades: Словарь с оценками для каждого класса.
     :return: True, если отзыв хороший, иначе False.
     """
+    # остаточная проверка, не буду пока убирать
     if api_key is None:
         api_key = os.getenv('MISTRAL_MODERATION_KEY')
     if not api_key:
