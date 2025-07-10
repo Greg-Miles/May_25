@@ -64,6 +64,8 @@
             <h5 class="mt-5">Оставить отзыв</h5>
             <form method="POST">
                 {% csrf_token %}
+                <input type="hidden" name="master" value="{{ master.id }}">
+                <input type="hidden" name="client_name" value="{{ request.user.username|default:'Гость' }}">
                 
                 <div class="form-group mb-3">
                     <label for="{{ form.text.id_for_label }}">Ваш отзыв:</label>

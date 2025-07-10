@@ -37,7 +37,6 @@ def is_good_review(text: str, api_key:str=MISTRAL_MODERATION_KEY, grades: dict =
 
     result = response.results[0].category_scores
 
-    pprint(result)
 
     for key, value in result.items():
         if key in grades:

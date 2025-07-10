@@ -361,7 +361,11 @@ def master_detail(request, master_id):
     
     # Handle review submission
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST or None, 
+                  initial={
+                    'master': master.id,
+                    'client_name': request.user.username or 'Гость'
+                  })
         if form.is_valid():
             review = form.save(commit=False)
             review.master = master

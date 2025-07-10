@@ -2,150 +2,149 @@
 
 ## Описание проекта
 
-Веб-приложение для барбершопа "Горшок", разработанное на Django. Система позволяет клиентам просматривать услуги, записываться к мастерам, оставлять отзывы, а мастерам и администраторам - управлять записями и профилями.
+Веб-приложение для барбершопа "Горшок" на Django.  
+Клиенты могут просматривать услуги, записываться, оставлять отзывы.  
+Мастера и админы — управлять записями, профилями и модерацией отзывов через Mistral AI.
 
-### Основные функции
+## Структура проекта
 
-- Регистрация и авторизация пользователей
-- Просмотр профилей мастеров и предоставляемых услуг
-- Онлайн-запись на услуги барбершопа
-- Система отзывов о мастерах
-- Личный кабинет клиента с историей посещений
-- Панель управления для мастеров и администраторов
+├ manage.py  
+├ .env                 ← ваш файл с переменными окружения  
+├ requirements.txt  
+├ barbershop/          ← Django-пакет  
+│  ├ settings.py       ← настройки проекта  
+│  ├ urls.py  
+│  └ …  
+└ core/                ← основное приложение  
+   ├ models.py  
+   ├ views.py  
+   ├ forms.py  
+   ├ signals.py  
+   ├ mistral.py        ← модуль работы с Mistral AI  
+   └ …  
 
-## Технические требования
+## Требования
 
-### Системные требования
+• Python 3.8+  
+• Django 4.0+  
+• Poetry 1.0+ (рекомендуется) или pip + venv  
+• PostgreSQL 12+ (опционально)  
 
-| Компонент | Минимальная версия |
-|-----------|-------------------|
-| Python    | 3.8+              |
-| Django    | 4.0+              |
-| PostgreSQL | 12.0+ (опционально) |
-| Poetry    | 1.0+              |
+## Установка
 
-### Зависимости
-
-| Пакет | Версия | Описание |
-|-------|--------|----------|
-| Django | 4.0+ | Веб-фреймворк |
-| Pillow | 9.0+ | Обработка изображений |
-| django-crispy-forms | 1.14+ | Улучшенный рендеринг форм |
-| django-ratelimit | 3.0+ | Ограничение частоты запросов |
-| psycopg2-binary | 2.9+ | Драйвер PostgreSQL |
-
-## Установка и настройка
-
-### Клонирование репозитория
-
+### Клонирование
 ```bash
 git clone https://github.com/Greg-Miles/May_25.git
 cd May_25
 ```
 
-### Установка зависимостей
+### Создать и активировать виртуальное окружение
 
-#### С использованием Poetry (рекомендуется)
-
+С Poetry (рекомендуется):
 ```bash
 poetry install
 poetry shell
 ```
 
-#### С использованием pip
-
+С venv + pip:
 ```bash
 python -m venv venv
-source venv/bin/activate  # На Windows: venv\Scripts\activate
+source venv/bin/activate    # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Настройка базы данных
+### Настроить файл `.env`
 
-#### SQLite (по умолчанию)
+В корне проекта (рядом с `manage.py`) создайте файл `.env` (UTF-8 без BOM).  
+Пример содержимого:
 
+```env:.env
+# Django
+SECRET_KEY=your_django_secret_key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+
+
+
+
+# Дополнительные переменные, если нужно
+# EMAIL_HOST=...
+# EMAIL_PORT=...
+```
+
+### Загрузка `.env` в `settings.py`
+
+В `barbershop/settings.py` добавьте в начало:
+```python:barbershop/settings.py
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# путь к корню проекта
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# загружаем .env
+load_dotenv(dotenv_path=BASE_DIR / '.env')
+
+# далее — все стандартные настройки Django
+SECRET_KEY = os.getenv('SECRET_KEY')
+DEBUG = os.getenv('DEBUG') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+...
+```
+
+## Установка и миграции БД
+
+По умолчанию используется SQLite:
 ```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
 
-#### PostgreSQL
-
-1. Создайте базу данных в PostgreSQL
-2. Обновите настройки в `settings.py`:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'barbershop_db',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
-
-3. Выполните миграции:
-
-```bash
-python manage.py migrate
-```
-
-### Создание суперпользователя
-
-```bash
-python manage.py createsuperuser
-```
-
-### Загрузка тестовых данных (опционально)
-
-```bash
-python manage.py loaddata fixtures/initial_data.json
-```
+Если PostgreSQL — настройте `DATABASES` в `settings.py` или используйте переменную `DATABASE_URL`, например через `dj-database-url`.
 
 ## Запуск проекта
-
-### Запуск сервера разработки
 
 ```bash
 python manage.py runserver
 ```
+Открыть в браузере: http://127.0.0.1:8000/
 
-После запуска сервера приложение будет доступно по адресу: http://127.0.0.1:8000/
+Админ-панель: http://127.0.0.1:8000/admin/  
+Создать суперпользователя:
+```bash
+python manage.py createsuperuser
+```
 
-### Доступ к панели администратора
+## Особенности
 
-Панель администратора доступна по адресу: http://127.0.0.1:8000/admin/
+— В `core/mistral.py` модуль `is_good_review()` берёт ключ MISTRAL_MODERATION_KEY из окружения и передаёт его в Mistral AI.  
+— Сигнал `core/signals.py` после сохранения отзыва вызывает `is_good_review()` и обновляет поле `ai_checked_status`.  
+— Если отзыв не прошёл модерацию — он не публикуется и помечается `ai_cancelled`.  
 
-## Структура проекта
+## Настройка Jazzmin (опционально)
 
-| Директория/Файл | Описание |
-|-----------------|----------|
-| `core/` | Основное приложение |
-| `core/models.py` | Модели данных |
-| `core/views.py` | Представления |
-| `core/forms.py` | Формы |
-| `core/admin.py` | Настройки админ-панели |
-| `templates/` | HTML-шаблоны |
-| `static/` | Статические файлы (CSS, JS, изображения) |
-| `media/` | Загружаемые пользователями файлы |
-| `barbershop/` | Настройки проекта |
+Если вы используете Jazzmin для админ-темы, можно добавить в `settings.py`:
 
-## Разработка
+```python:barbershop/settings.py
+JAZZMIN_SETTINGS = {
+    "site_url": "/",
+    "topmenu_links": [
+        {"name": "На сайт", "url": "/", "icon": "fas fa-home"},
+    ],
+    "usermenu_links": [
+        {"name": "Exit to site", "url": "/", "icon": "fas fa-external-link-alt", "new_window": False},
+    ],
+}
+```
 
-### Запуск тестов
+## Тестирование и линтинг
 
 ```bash
 python manage.py test
-```
-
-### Проверка стиля кода
-
-```bash
 flake8
 ```
 
 ## Лицензия
 
-Этот проект распространяется под лицензией MIT. Подробности в файле LICENSE.
+Проект является учебным и не распространяется, но если вы хотите его скачать, то чтож я вам сделаю.
