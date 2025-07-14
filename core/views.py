@@ -265,14 +265,20 @@ def make_order(request, master_id=None):
     :returns render: Рендер страницы создания заказа
     """
     if request.method == 'POST':
-        form = OrderForm(request.POST, master_id=master_id, is_staff=request.user.is_staff)
+        form = OrderForm(request.POST, master_id=master_id)
         if form.is_valid():
             order = form.save(commit=False)
             if request.user.is_authenticated:
                 order.client_name = request.user.username
+
+            if not request.user.is_staff:
+                order.status = 'not_approved'
             order.save()
             form.save_m2m()
+            messages.success(request, "Заказ успешно создан!")
             return redirect('thanks')
+
+        messages.error(request, "Ошибка при создании заказа. Пожалуйста, проверьте введенные данные.")
     else:
         initial_data = {}
         if request.user.is_authenticated:
@@ -311,8 +317,9 @@ def update_order(request, order_id):
         form = OrderForm(request.POST, instance=order, is_staff=request.user.is_staff)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Заказ успешно обновлен!')
+            messages.success(request, f'Заказ {order.id} успешно обновлен!')
             return redirect('orders_list')
+        messages.error(request, "Ошибка при обновлении заказа. Пожалуйста, проверьте введенные данные.")
     else:
         form = OrderForm(instance=order, is_staff=request.user.is_staff)
     
@@ -409,6 +416,8 @@ def make_review(request):
             review.save()
             messages.success(request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
             return redirect('master_detail', master_id=review.master.id)
+        else:
+            messages.error(request, 'Ошибка при создании отзыва. Пожалуйста, проверьте введенные данные.')
     else:
         form = ReviewForm()
 

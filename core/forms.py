@@ -31,7 +31,7 @@ class OrderForm(forms.ModelForm):
     """
     class Meta:
         model = Order
-        fields = ['client_name', 'phone', 'master', 'appointment_date', 'services', 'comment', 'status']
+        fields = ['client_name', 'phone', 'master', 'appointment_date', 'services', 'comment',]
         widgets = {
             'appointment_date': forms.DateTimeInput(
                 attrs={'type': 'datetime-local'},
@@ -56,8 +56,7 @@ class OrderForm(forms.ModelForm):
         master_id = kwargs.pop('master_id', None)
         super().__init__(*args, **kwargs)
         
-        if not is_staff:
-            del self.fields['status']
+
 
         if master_id:
             try:
