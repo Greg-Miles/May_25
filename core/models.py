@@ -37,6 +37,7 @@ class Master(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='master_profile')
     name = models.CharField(max_length=100, verbose_name="Имя мастера")
+    tag_name = models.CharField(max_length=50, verbose_name='Тег для уведомлений', blank=True)
     photo = models.ImageField(upload_to="masters/", verbose_name="Фото мастера", blank=True)
     phone = models.CharField(max_length=20, verbose_name="Номер телефона")
     address = models.CharField(max_length=255, verbose_name="Адрес", default="Не указан")
@@ -46,6 +47,14 @@ class Master(models.Model):
 
     def __str__(self):
         return f"Мастер {self.name}"
+    
+    def save(self, *args, **kwargs):
+        # Автоматически генерируем тег из имени, если не задан
+        if not self.tag_name and self.name:
+            parts = self.name.split()
+            if len(parts) >= 3:
+                self.tag_name = parts[2].strip('"')
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Мастер"
