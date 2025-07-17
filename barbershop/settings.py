@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'core',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -137,8 +138,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Настройки аутентификации
-LOGIN_REDIRECT_URL = ''  # URL для перенаправления после успешного входа
-LOGOUT_REDIRECT_URL = ''  # URL для перенаправления после выхода
+LOGIN_REDIRECT_URL = '/'  # URL для перенаправления после успешного входа
+LOGOUT_REDIRECT_URL = '/'  # URL для перенаправления после выхода
 LOGIN_URL = 'login'  # URL для страницы входа
 
 

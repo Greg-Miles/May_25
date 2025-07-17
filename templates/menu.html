@@ -47,7 +47,7 @@
                   <a class="nav-link" href="{% url 'logout' %}">Выйти</a>
               </li>
           {% else %}
-            {% if request.path != '/login/' and request.path != '/register/' %}
+            {% if request.path != '/users/login/' and request.path != '/users/register/' %}
               <form class="d-flex flex-lg-row flex-column gap-2" method="post" action="{% url 'login' %}">
                 {% csrf_token %}
                 <input type="text" name="username" class="form-control form-control-sm me-2" placeholder="Логин" required>
