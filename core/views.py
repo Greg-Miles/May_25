@@ -7,6 +7,7 @@ from django.db.models import Q
 from .forms import OrderForm, ReviewForm
 from core.models import *
 from django.contrib.auth.models import User
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 
 
 def is_staff(user):
@@ -17,35 +18,26 @@ def is_staff(user):
     """
     return user.is_staff
 
-# Create your views here.
-
-def landing(request):
+class LandingView(TemplateView):
     """
-    Представление для главной страницы.
-    :param request: запрос
-    :returns render: Рендер главной страницы
+    Класс представления для главной страницы.
     """
-    context = {
-        'masters': Master.objects.all(),
-        'services': Service.objects.all(),
-        'reviews': Review.objects.filter(is_published=True).order_by('-created_at')[:5],
-        "title": 'Барбершоп "Горшок"',
+    template_name = 'landing.html'
 
-    }
-    return render(request, "landing.html", context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['masters'] = Master.objects.all()
+        context['services'] = Service.objects.all()
+        context['reviews'] = Review.objects.filter(is_published=True).order_by('-created_at')[:5]
+        context["title"] = 'Барбершоп "Горшок"'
+        return context
 
-def thanks(request):
+
+class ThanksView(TemplateView):
     """
-    Представление, вызываемое при нажатии на кнопку 'Записаться'.
-    :param request: запрос
-    :returns render: Рендер станицы с ответом
+    Класс представления для страницы с ответом после успешной записи.
     """
-    context = {
-    'masters': Master.objects.all(),
-    'services': Service.objects.all(),
-
-    }
-    return render(request, 'thanks.html', context)
+    template_name = 'thanks.html'
 
 
 @login_required

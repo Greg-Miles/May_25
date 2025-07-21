@@ -24,8 +24,8 @@ from core.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', landing, name='landing'),
-    path('thanks/', thanks, name='thanks'),
+    path('', LandingView.as_view(), name='landing'),
+    path('thanks/', ThanksView.as_view(), name='thanks'),
     path('orders/', orders_list, name='orders_list'),
     path('orders/<int:order_id>/', order_detail, name='order_detail'),
     path('orders/<int:order_id>/update/', update_order, name='update_order'),
