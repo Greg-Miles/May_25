@@ -5,6 +5,11 @@
 
 
 {% block content %}
+
+<p>Messages count: {{ messages|length }}</p>
+{% for message in messages %}
+    <p>Message: {{ message }} ({{ message.tags }})</p>
+{% endfor %}
 <div class="container row bg-dark p-3 rounded-3">
     
     <form>
@@ -75,12 +80,12 @@
     {% for order in orders %}
         <div class="col-12 col-md-6 col-lg-4">
             {% include "order_detail_partial.html" %}
-            <a href="{% url "update_order" order_id=order.id %}" class="btn btn-warning my-2">
+            <a href="{% url "update_order" pk=order.id %}" class="btn btn-warning my-2">
             <i>
                 <span class="bi bi-pencil-square">Редактировать</span> 
             </i>
             </a>
-            <a href="{% url "delete_order" order_id=order.id %}" class="btn btn-dark my-2">
+            <a href="{% url "delete_order" pk=order.id %}" class="btn btn-dark my-2">
                 <i>
                     <span class="bi bi-trash">Удалить</span> 
                 </i>

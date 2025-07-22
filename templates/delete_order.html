@@ -17,7 +17,7 @@
                     {% include "order_detail_partial.html" %}
                 </div>
                 <div class="card-footer text-muted">
-                    <form method="POST" action="{% url 'delete_order' order_id=order.id %}">
+                    <form method="POST" action="{% url 'delete_order' pk=order.id %}">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-danger">Удалить</button>
                         <a href="{% url 'orders_list' %}" class="btn btn-secondary">Отмена</a>

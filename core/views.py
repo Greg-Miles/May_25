@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponseNotFound, JsonResponse
+from django.http import HttpResponseNotFound, JsonResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -123,9 +123,6 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 
 
-
-
-
 def get_master_services(request):
     """
     AJAX представление для получения услуг мастера.
@@ -145,6 +142,7 @@ def get_master_services(request):
     return JsonResponse({'services': services_data})
 
 
+# CREATE - создание заказа
 class OrderCreateView(CreateView):
     """
     Класс представления для создания заказа.
@@ -195,103 +193,164 @@ class OrderCreateView(CreateView):
 
 
 # UPDATE - редактирование заказа (только для персонала)
-@login_required
-@user_passes_test(is_staff)
-def update_order(request, order_id):
+class UpdateOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
-    Представление для редактирования заказа (только для персонала).
+    Класс представления для обновления заказа.
     """
-    order = get_object_or_404(Order, id=order_id)
-    if request.method == 'POST':
-        form = OrderForm(request.POST, instance=order, is_staff=request.user.is_staff)
-        if form.is_valid():
-            form.save()
-            messages.success(request, f'Заказ {order.id} успешно обновлен!')
-            return redirect('orders_list')
-        messages.error(request, "Ошибка при обновлении заказа. Пожалуйста, проверьте введенные данные.")
-    else:
-        form = OrderForm(instance=order, is_staff=request.user.is_staff)
+    model = Order
+    form_class = OrderForm
+    template_name = 'make_order.html'
+    success_url = reverse_lazy('orders_list')
+
+    def test_func(self):
+        """
+        Проверяет, является ли пользователь мастером.
+        """
+        return self.request.user.is_staff
     
-    context = {
-        'form': form, 
-        'order': order,
-        'title': f'Редактирование заказа #{order.id}',
-        'action': 'update',
-        'submit_text': 'Сохранить изменения'
-    }
-    return render(request, 'make_order.html', context)
+    def get_context_data(self, **kwargs):
+        """
+        Получает контекст данных для рендеринга шаблона.
+        """
+        context = super().get_context_data(**kwargs)
+        context['action'] = "update"
+        context['title'] = f'Редактирование заказа #{self.object.id}'
+        context['submit_text'] = "Сохранить изменения"
+        return context
+    
+    def form_valid(self, form):
+        """
+        Обрабатывает валидную форму и сохраняет изменения.
+        """
+        messages.success(self.request, f'Заказ #{self.object.id} успешно обновлен!')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        """
+        Обрабатывает невалидную форму и возвращает ошибки.
+        """
+        messages.error(self.request, "Ошибка при обновлении заказа. Пожалуйста, проверьте введенные данные.")
+        return super().form_invalid(form)
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Обрабатывает GET запрос для отображения формы редактирования заказа.
+        """
+        self.object = self.get_object()
+        form_class = self.get_form_class()
+        form = self.get_form(form_class)
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
+    
+    def post(self, request, *args, **kwargs):
+        """
+        Обрабатывает POST запрос для обновления заказа.
+        """
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            return self.form_valid(form)
+        else:
+            return self.form_invalid(form)
+        
+
 
 # DELETE - удаление заказа (только для персонала)
-@login_required
-@user_passes_test(is_staff)
-def delete_order(request, order_id):
+class DeleteOrderView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
-    Представление для удаления заказа (только для персонала).
+    Класс представления для удаления заказа.
     """
-    order = get_object_or_404(Order, id=order_id)
-    if request.method == 'POST':
-        order_id_for_message = order.id
-        order.delete()
+    model = Order
+    template_name = 'delete_order.html'
+    success_url = reverse_lazy('orders_list')
+    def test_func(self):
+        """
+        Проверяет, является ли пользователь мастером.
+        """
+        return self.request.user.is_staff
+
+    def get_context_data(self, **kwargs):
+        """
+        Получает контекст данных для рендеринга шаблона.
+        """
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Удаление заказа #{self.object.id}'
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Обрабатывает POST запрос для удаления заказа.
+        """
+        self.object = self.get_object()
+        order_id_for_message = self.object.id
+        
+        # Добавляем сообщение
         messages.success(request, f'Заказ #{order_id_for_message} успешно удален!')
-        return redirect('orders_list')
-    
-    context = {
-        'order': order,
-        'title': f'Удаление заказа #{order.id}'
-    }
-    return render(request, 'delete_order.html', context)
+        
+        # Удаляем объект
+        self.object.delete()
+        
+        # Возвращаем редирект
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get(self, request, *args, **kwargs):
+        """
+        Обрабатывает GET запрос для отображения страницы удаления заказа.
+        """
+        self.object = self.get_object()
+        context = self.get_context_data()
+        return self.render_to_response(context)
 
 
-def master_detail(request, master_id):
+class MasterDetailView(DetailView):
     """
-    Представление для просмотра деталей мастера и добавления отзывов.
-    :param request: запрос
-    :param master_id: идентификатор мастера
-    :returns render: Рендер страницы деталей мастера
+    Представление для просмотра деталей мастера.
     """
-    master = get_object_or_404(Master, id=master_id)
-    services = Service.objects.filter(masters=master)
-    
-    # Get published reviews for this master
-    reviews = Review.objects.filter(master=master, is_published=True,).order_by('-created_at')[:5]
-    
-    # Handle review submission
-    if request.method == 'POST':
-        form = ReviewForm(request.POST or None, 
+    model = Master
+    template_name = 'master_detail.html'
+    context_object_name = 'master'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        master = self.get_object()
+        services = Service.objects.filter(masters=master)
+        reviews = Review.objects.filter(master=master, is_published=True,).order_by('-created_at')[:5]
+        form = ReviewForm()
+        context['services'] = services
+        context['reviews'] = reviews
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """
+        Обрабатывает POST запрос для добавления отзыва.
+        """
+        self.object = self.get_object()
+        form = ReviewForm(request.POST or None,
                   initial={
-                    'master': master.id,
+                    'master': self.object.id,
                     'client_name': request.user.username or 'Гость'
                   })
         if form.is_valid():
             review = form.save(commit=False)
-            review.master = master
-            
-            # Set the client name based on authentication status
+            review.master = self.object
+
+            # Если пользователь аутентифицирован, используем его имя
+            # иначе используем "Гость"
             if request.user.is_authenticated:
                 review.client_name = request.user.username
             else:
                 review.client_name = "Гость"
-                
-            # Set review as unpublished until approved (optional)
+
+            # Ревью не публикуем пока яишенка не проверит.
             review.is_published = False
-            
+
             review.save()
             messages.success(request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
-            return redirect('master_detail', master_id=master_id)
-    else:
-        form = ReviewForm()
-    
-    context = {
-        'master': master,
-        'services': services,
-        'reviews': reviews,
-        'form': form,
-    }
-    
-    return render(request, 'master_detail.html', context)
+            return redirect('master_detail', pk=self.object.id)
 
 
-
+# CREATE - создание отзыва
 class ReviewCreateView(CreateView):
     """
     Представление для создания отзыва.
