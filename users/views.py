@@ -11,39 +11,50 @@ from django.views.generic import TemplateView, ListView, DetailView, CreateView,
 from django.urls import reverse_lazy
 
 
-def register(request):
+class RegistrationView(CreateView):
     """
-    Представление для регистрации пользователя.
-    :param request: запрос
-    :returns render: Рендер страницы регистрации
+    Класс представления для регистрации пользователя.
     """
+    model = User
+    form_class = UserRegistrationForm
+    template_name = 'register.html'
+    success_url = reverse_lazy('landing')
 
-    if request.user.is_authenticated:
-        return redirect('landing') # если пользователь уже авторизован, перенаправляем на главную страницу
-      
-    if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('landing') # если регистрация прошла успешно, также перенаправляем на главную страницу
-        else:
-            messages.error(request, 'Ошибка регистрации. Пожалуйста, проверьте введенные данные.')
-    else:
-        form = UserRegistrationForm()
-    return render(request, 'register.html', {'form': form})
+    def form_valid(self, form):
+        """
+        Обработка валидной формы.
+        """
+        user = form.save()
+        login(self.request, user)
+        return redirect('landing')
 
 
-def user_login(request):
-    """
-    Представление для входа пользователя.
-    :param request: запрос
-    :returns render: Рендер страницы входа
-    """
-    if request.user.is_authenticated:
-        return redirect('landing')  # если пользователь уже авторизован, перенаправляем на главную страницу
 
-    if request.method == 'POST':
+class UserLoginView(UserPassesTestMixin,TemplateView):
+    """
+    Класс представления для страницы входа пользователя.
+    """
+    template_name = 'login.html'
+
+    def test_func(self):
+        """
+        Проверка, обратная LoginRequiredMixin.
+        """
+        return not self.request.user.is_authenticated
+    
+    def handle_no_permission(self):
+        """
+        Переопределяем обработку отсутствия разрешения.
+        """
+        messages.error(self.request, "Сначала надо выйти из аккаунта")
+        return redirect('landing')
+    
+    def get(self, request, *args, **kwargs):
+
+        form = AuthenticationForm()
+        return render(request, self.template_name, {'form': form})
+    
+    def post(self, request, *args, **kwargs):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -61,19 +72,20 @@ def user_login(request):
             if'login' not in request.path:
                 referer = request.META.get('HTTP_REFERER', 'landing')
                 return redirect(referer)
-    else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+        return render(request, self.template_name, {'form': form})
+    
 
-def user_logout(request):
+class UserLogoutView(LoginRequiredMixin, TemplateView):
     """
-    Представление для выхода пользователя с немедленным перенаправлением на главную страницу.
-    :param request: запрос
-    :returns redirect: Перенаправление на главную страницу
+    Класс представления для выхода пользователя с немедленным перенаправлением на главную страницу.
     """
-    logout(request)
-    return redirect('landing')
-
+    
+    def get(self, request, *args, **kwargs):
+        """
+        Обработка GET-запроса.
+        """
+        logout(request)
+        return redirect('landing')
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
