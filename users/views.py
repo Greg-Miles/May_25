@@ -1,10 +1,15 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from .forms import UserRegistrationForm
 from core.models import Order, Review
+from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
 
 def register(request):
     """
@@ -69,33 +74,68 @@ def user_logout(request):
     logout(request)
     return redirect('landing')
 
-@login_required
-def profile(request):
-    """
-    Представление для профиля пользователя.
-    :param request: запрос
-    :returns render: Рендер страницы профиля
-    """
-    # Проверяем, является ли пользователь мастером
-    is_master = hasattr(request.user, 'master_profile')
-    
-    context = {
-        'user': request.user,
-        'is_master': is_master,
-    }
-    
-    if is_master:
-        master = request.user.master_profile
-        context['master'] = master
-        orders = Order.objects.filter(master=master).order_by('-appointment_date')
-        context['orders'] = orders
 
-        reviews = Review.objects.filter(master=master, is_published=True).order_by('-created_at')
-        context['reviews'] = reviews
-    else:
-        # Если пользователь не мастер, получаем его заказы
-        orders = Order.objects.filter(client_name=request.user.username).order_by('-appointment_date')
-        context['orders'] = orders
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    """
+    Класс представления для профиля пользователя.
+    """
+    template_name = 'profile.html'
     
-    return render(request, 'profile.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Проверяем, является ли пользователь мастером
+        is_master = hasattr(user, 'master_profile')
+        
+        context.update({
+            'user': user,
+            'is_master': is_master,
+        })
+        
+        if is_master:
+            master = user.master_profile
+            context['master'] = master
+            orders = Order.objects.filter(master=master).order_by('-appointment_date')
+            context['orders'] = orders
+
+            reviews = Review.objects.filter(master=master, is_published=True).order_by('-created_at')
+            context['reviews'] = reviews
+        else:
+            # Если пользователь не мастер, получаем его заказы
+            orders = Order.objects.filter(client_name=user.username).order_by('-appointment_date')
+            context['orders'] = orders
+        
+        return context
+
+
+class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    Представление для отмены заказа клиентом.
+    """
+    model = Order
+    success_url = reverse_lazy('profile')
+
+    def get_object(self, queryset=None):
+        order_id = self.kwargs.get('pk')
+        return get_object_or_404(Order, id=order_id, client_name=self.request.user.username)
+    
+    def test_func(self):
+        """
+        Проверяем, что пользователь может отменить этот заказ.
+        """
+        order = self.get_object()
+        # Проверяем, что заказ принадлежит пользователю и его можно отменить
+        return (order.client_name == self.request.user.username and 
+                order.status not in ['done', 'canceled'])
+
+
+
+    def delete(self, request, *args, **kwargs):
+        order = self.get_object()
+        order.status = 'canceled'
+        order.save()
+        messages.success(request, f'Заказ #{order.id} успешно отменен!')
+        return redirect(self.success_url)
 

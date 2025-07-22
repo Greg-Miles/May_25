@@ -122,30 +122,7 @@ class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return self.request.user.is_staff
 
 
-# Представление для отмены заказа клиентом (опционально)
-@login_required
-def cancel_my_order(request, order_id):
-    """
-    Представление для отмены своего заказа клиентом.
-    """
-    order = get_object_or_404(Order, id=order_id, client_name=request.user.username)
-    
-    # Проверяем, можно ли отменить заказ (например, только если он еще не в работе)
-    if order.status in ['done', 'canceled']:
-        messages.error(request, 'Этот заказ нельзя отменить.')
-        return redirect('my_order_detail', order_id=order.id)
-    
-    if request.method == 'POST':
-        order.status = 'canceled'
-        order.save()
-        messages.success(request, f'Заказ #{order.id} успешно отменен!')
-        return redirect('my_orders')
-    
-    context = {
-        'order': order,
-        'title': f'Отмена заказа #{order.id}'
-    }
-    return render(request, 'orders/cancel.html', context)
+
 
 
 

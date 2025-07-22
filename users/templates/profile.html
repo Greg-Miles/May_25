@@ -170,7 +170,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for order in client_orders %}
+                                    {% for order in orders %}
+                                        {% if order.status != 'canceled' %}
                                         <tr>
                                             <td>{{ order.appointment_date|date:"d.m.Y H:i" }}</td>
                                             <td>{{ order.master.name|default:"Не назначен" }}</td>
@@ -192,7 +193,22 @@
                                                     <span class="badge bg-danger">Отменена</span>
                                                 {% endif %}
                                             </td>
+                                            <td>
+                                                 {% if order.status not in 'done,canceled' %}
+                                                    <form method="post" action="{% url 'cancel_order' order.id %}" style="display: inline;">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-danger btn-sm" 
+                                                                onclick="return confirm('Вы уверены, что хотите отменить заказ #{{ order.id }}?')">
+                                                            Отменить
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    <span class="text-muted">—</span>
+                                                {% endif %}
+                                            </td>
+                                            
                                         </tr>
+                                        {% endif %}
                                     {% empty %}
                                         <tr>
                                             <td colspan="4" class="text-center">У вас пока нет записей</td>
