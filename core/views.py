@@ -7,7 +7,10 @@ from django.db.models import Q
 from .forms import OrderForm, ReviewForm
 from core.models import *
 from django.contrib.auth.models import User
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+
 
 
 def is_staff(user):
@@ -40,84 +43,83 @@ class ThanksView(TemplateView):
     template_name = 'thanks.html'
 
 
-@login_required
-@user_passes_test(is_staff)
-def orders_list(request):
+class OrderListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """
-    Представление для просмотра всех записей.
-    :param request: запрос
-    :returns render: Рендер главной страницы, модифицированный для показа всех записей.
+    Класс представления для просмотра всех записей.
     """
-    q = request.GET.get("q")
-    search_by_phone = request.GET.get("search_by_phone", "false") == "true"
-    search_by_name  = request.GET.get("search_by_name", "false") == "true"
-    search_by_comment = request.GET.get("search_by_comment", "false") == "true"
+    model = Order
+    template_name = 'orders.html'
+    context_object_name = 'orders'
+    ordering = ['-date_created']
 
-    order_by_date = request.GET.get("order_by_date", "desc")
+    def test_func(self):
+        """
+        Проверка, является ли пользователь мастером.
+        """
+        return self.request.user.is_staff
+    
+    def get_queryset(self):
+        """
+        Обработка фильтров и сортировки поиска.
+        """
+        q = self.request.GET.get("q")
+        search_by_phone = self.request.GET.get("search_by_phone", "false") == "true"
+        search_by_name  = self.request.GET.get("search_by_name", "false") == "true"
+        search_by_comment = self.request.GET.get("search_by_comment", "false") == "true"
 
-    status_not_approved = request.GET.get("status_not_approved", "false") == "true"
-    status_approved = request.GET.get("status_approved", "false") == "true"
-    status_in_progress = request.GET.get("status_in_progress", "false") == "true"
-    status_done = request.GET.get("status_done", "false") == "true"
-    status_canceled = request.GET.get("status_canceled", "false") == "true"
+        order_by_date = self.request.GET.get("order_by_date", "desc")
 
-    query = Order.objects.all()
+        status_not_approved = self.request.GET.get("status_not_approved", "false") == "true"
+        status_approved = self.request.GET.get("status_approved", "false") == "true"
+        status_in_progress = self.request.GET.get("status_in_progress", "false") == "true"
+        status_done = self.request.GET.get("status_done", "false") == "true"
+        status_canceled = self.request.GET.get("status_canceled", "false") == "true"
 
-    base_q = Q()
+        query = Order.objects.all()
 
-    if q:
-        if search_by_phone:
-            base_q |= Q(phone__icontains=q)
-        if search_by_name:
-            base_q |= Q(master__name__icontains=q)
-        if search_by_comment:
-            base_q |= Q(comment__icontains=q)
+        base_q = Q()
 
-    if order_by_date == "asc":
-        query = query.order_by("date_created")
-    else:
-        query = query.order_by("-date_created")
+        if q:
+            if search_by_phone:
+                base_q |= Q(phone__icontains=q)
+            if search_by_name:
+                base_q |= Q(master__name__icontains=q)
+            if search_by_comment:
+                base_q |= Q(comment__icontains=q)
 
-    if status_not_approved:
-        base_q |= Q(status="not_approved")
-    if status_approved:
-        base_q |= Q(status="approved")
-    if status_in_progress:
-        base_q |= Q(status="in_progress")
-    if status_done:
-        base_q |= Q(status="done")
-    if status_canceled:
-        base_q |= Q(status="canceled")
-    orders = query.filter(base_q)
-    context = {
-        "orders" : orders,
-        "title": 'Список заказов',
-    }
-    return render(request, "orders.html", context)
+        if order_by_date == "asc":
+            query = query.order_by("date_created")
+        else:
+            query = query.order_by("-date_created")
+
+        if status_not_approved:
+            base_q |= Q(status="not_approved")
+        if status_approved:
+            base_q |= Q(status="approved")
+        if status_in_progress:
+            base_q |= Q(status="in_progress")
+        if status_done:
+            base_q |= Q(status="done")
+        if status_canceled:
+            base_q |= Q(status="canceled")
+        orders = query.filter(base_q)
+        return orders
 
 
-@login_required
-@user_passes_test(is_staff)
-def order_detail(request, order_id: int):
+
+class OrderDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     """
-    Представление для одной записи.
-    :param request: запрос
-    :param order_id: номер записи в базе данных
-    :returns render: Рендер главной страницы, модифицированный для показа данных о конкретной записи
+    Класс представления для одной записи.
     """
-    try:
-        order = Order.objects.get(id=order_id)
-    except Order.DoesNotExist:
-        return HttpResponseNotFound("Заказ не найден")
-    master_name = "Мастер не назначен"
-    if order.master:
-        master_name = order.master.name
-    context = {
-        "order": Order.objects.get(id=order_id),
-        "master_name": master_name,
+    model = Order
+    template_name = 'orders_detail.html'
+    context_object_name = 'order'
 
-    }
-    return render(request, 'orders_detail.html', context)
+    def test_func(self):
+        """
+        Проверка, является ли пользователь мастером.
+        """
+        return self.request.user.is_staff
 
 
 # Представление для отмены заказа клиентом (опционально)
@@ -165,53 +167,54 @@ def get_master_services(request):
         services_data = [{'id': service.id, 'name': service.name, 'price': service.price} for service in services]
     return JsonResponse({'services': services_data})
 
-#CREATE - создание заказа
-def make_order(request, master_id=None):
+
+class OrderCreateView(CreateView):
     """
-    Представление для создания заказа.
-    :param request: запрос
-    :param master_id: идентификатор мастера (по умолчанию None)
-    :returns render: Рендер страницы создания заказа
+    Класс представления для создания заказа.
     """
-    if request.method == 'POST':
-        form = OrderForm(request.POST, master_id=master_id)
-        if form.is_valid():
-            order = form.save(commit=False)
-            if request.user.is_authenticated:
-                order.client_name = request.user.username
+    model = Order
+    form_class = OrderForm
+    template_name = 'make_order.html'
+    success_url = reverse_lazy('thanks')
 
-            if not request.user.is_staff:
-                order.status = 'not_approved'
-            order.save()
-            form.save_m2m()
-            messages.success(request, "Заказ успешно создан!")
-            return redirect('thanks')
+    def get_context_data(self, **kwargs):
+        """
+        Получает контекст данных для рендеринга шаблона.
+        """
+        context = super().get_context_data(**kwargs)
+        context['masters'] = Master.objects.all()
+        context['selected_master_id'] = self.kwargs.get('pk')
+        context['action'] = "create"
+        context['title'] = 'Записаться на услугу'
+        context['submit_text'] = "Записаться"
+        return context
+    
+    def get_initial(self):
+        """
+        Устанавливаем начальные значения для формы.
+        """
+        initial = super().get_initial()
+        if self.request.user.is_authenticated:
+            initial['client_name'] = self.request.user.username
 
-        messages.error(request, "Ошибка при создании заказа. Пожалуйста, проверьте введенные данные.")
-    else:
-        initial_data = {}
-        if request.user.is_authenticated:
-            initial_data['client_name'] = request.user.username
-
-        if master_id:
+        if 'pk' in self.kwargs:
             try:
-                master = Master.objects.get(id=master_id)
-                initial_data['master'] = master
+                master = Master.objects.get(id=self.kwargs['pk'])
+                initial['master'] = master
             except Master.DoesNotExist:
                 pass
-        form = OrderForm(initial=initial_data, master_id=master_id)
-    
-    masters = Master.objects.all()
-    selected_master_id = int(master_id) if master_id else None
-    context = {
-        'form': form, 
-        'masters': masters,
-        'selected_master_id': selected_master_id,
-        "action": "create",
-        'title': 'Записаться на услугу',
-        "submit_text": "Записаться",
-        }
-    return render(request, 'make_order.html', context)
+        return initial
+
+    def form_valid(self, form):
+        """
+        Обрабатывает валидную форму.
+        """
+        order = form.save(commit=False)
+        if self.request.user.is_authenticated:
+            order.client_name = self.request.user.username
+        order.save()
+        messages.success(self.request, "Заказ успешно создан!")
+        return super().form_valid(form)
 
 
 # UPDATE - редактирование заказа (только для персонала)
@@ -311,34 +314,19 @@ def master_detail(request, master_id):
     return render(request, 'master_detail.html', context)
 
 
-def make_review(request):
+
+class ReviewCreateView(CreateView):
     """
     Представление для создания отзыва.
-    :param request: запрос
-    :returns render: Рендер страницы создания отзыва
     """
-    if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            review = form.save(commit=False)
-            review.is_published = False  # Set the review as unpublished until approved
-            review.save()
-            messages.success(request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
-            return redirect('master_detail', master_id=review.master.id)
-        else:
-            messages.error(request, 'Ошибка при создании отзыва. Пожалуйста, проверьте введенные данные.')
-    else:
-        form = ReviewForm()
+    model = Review
+    form_class = ReviewForm
+    template_name = 'make_review.html'
+    success_url = reverse_lazy('thanks')
 
-        initial_data = {}
-        if request.user.is_authenticated:
-            initial_data['client_name'] = request.user.username
-        else:
-            initial_data['client_name'] = "Гость"
-        form = ReviewForm(initial=initial_data)
-
-    context = {
-        'form': form,
-    }
-
-    return render(request, 'make_review.html', context)
+    def form_valid(self, form):
+        review = form.save(commit=False)
+        review.is_published = False  # Не публикуем отзыв пока яишенка не проверит.
+        review.save()
+        messages.success(self.request, 'Спасибо за ваш отзыв! Он будет опубликован после проверки.')
+        return super().form_valid(form)

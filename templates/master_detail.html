@@ -83,7 +83,7 @@
             </form>
         </div>
     </div>
-    <button class="btn btn-warning make_appointment_with_master" data-url="{% url 'make_order_with_master' master.id %}">
-        Записаться
-    </button>
+    <a href="{% url 'make_order_with_master' pk=master.id %}" class="btn btn-warning">
+        Записаться к этому мастеру
+    </a>
 {% endblock content %}
