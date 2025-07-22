@@ -104,20 +104,24 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             context['reviews'] = reviews
         else:
             # Если пользователь не мастер, получаем его заказы
-            orders = Order.objects.filter(client_name=user.username).order_by('-appointment_date')
+            orders = Order.objects.filter(client_name=user.username).exclude(status='canceled').order_by('-appointment_date')
             context['orders'] = orders
         
         return context
 
 
-class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     Представление для отмены заказа клиентом.
     """
     model = Order
+    fields = []
     success_url = reverse_lazy('profile')
 
     def get_object(self, queryset=None):
+        """
+        Получаем объект заказа, который пользователь хочет отменить.
+        """
         order_id = self.kwargs.get('pk')
         return get_object_or_404(Order, id=order_id, client_name=self.request.user.username)
     
@@ -130,12 +134,13 @@ class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return (order.client_name == self.request.user.username and 
                 order.status not in ['done', 'canceled'])
 
-
-
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
+        """
+        Обновляем статус заказа на 'canceled'
+        """
         order = self.get_object()
         order.status = 'canceled'
         order.save()
-        messages.success(request, f'Заказ #{order.id} успешно отменен!')
+        messages.success(self.request, 'Заказ успешно отменен!')
         return redirect(self.success_url)
-
+    
