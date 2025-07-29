@@ -6,6 +6,7 @@ from .forms import UserRegistrationForm
 from core.models import Order, Review
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
@@ -27,64 +28,45 @@ class RegistrationView(CreateView):
         login(self.request, user)
         return redirect('landing')
 
-
-
-class UserLoginView(UserPassesTestMixin,TemplateView):
+    
+class CustomLoginView(LoginView):
     """
-    Класс представления для страницы входа пользователя.
+    Класс представления для страницы входа пользователя с использованием стандартного LoginView.
     """
     template_name = 'login.html'
+    authentication_form = AuthenticationForm
+    redirect_field_name = 'next'
 
-    def test_func(self):
+    def form_valid(self, form):
         """
-        Проверка, обратная LoginRequiredMixin.
+        Обработка валидной формы входа.
         """
-        return not self.request.user.is_authenticated
-    
-    def handle_no_permission(self):
-        """
-        Переопределяем обработку отсутствия разрешения.
-        """
-        messages.error(self.request, "Сначала надо выйти из аккаунта")
+        login(self.request, form.get_user())
+        messages.success(self.request, 'Вход выполнен успешно!')
         return redirect('landing')
     
-    def get(self, request, *args, **kwargs):
-
-        form = AuthenticationForm()
-        return render(request, self.template_name, {'form': form})
-    
-    def post(self, request, *args, **kwargs):
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                login(request, user)
-                # Перенаправляем на страницу, с которой пришел пользователь, или на главную
-                next_page = request.POST.get('next', 'landing')
-                return redirect(next_page)
-        else:
-            # Если форма невалидна, добавляем сообщение об ошибке
-            messages.error(request, 'Неверное имя пользователя или пароль.')
-            # Если запрос был отправлен из меню, перенаправляем на главную
-            if'login' not in request.path:
-                referer = request.META.get('HTTP_REFERER', 'landing')
-                return redirect(referer)
-        return render(request, self.template_name, {'form': form})
-    
-
-class UserLogoutView(LoginRequiredMixin, TemplateView):
-    """
-    Класс представления для выхода пользователя с немедленным перенаправлением на главную страницу.
-    """
-    
-    def get(self, request, *args, **kwargs):
+    def form_invalid(self, form):
         """
-        Обработка GET-запроса.
+        Обработка невалидной формы входа.
         """
-        logout(request)
-        return redirect('landing')
+        messages.error(self.request, 'Неверное имя пользователя или пароль.')
+        return super().form_invalid(form)
+   
+
+class LogoutConfirmView(TemplateView):
+    """
+    Класс представления для выхода пользователя с использованием стандартного LogoutView.
+    """
+    template_name = 'logout_confirm.html'
+    next_page = 'landing'
+
+class CustomLogoutView(LogoutView):
+    """
+    Класс представления для выхода пользователя с использованием стандартного LogoutView.
+    """
+
+    next_page = 'landing'
+    
 
 
 class ProfileView(LoginRequiredMixin, TemplateView):
@@ -154,4 +136,3 @@ class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         order.save()
         messages.success(self.request, 'Заказ успешно отменен!')
         return redirect(self.success_url)
-    

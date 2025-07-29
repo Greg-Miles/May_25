@@ -2,12 +2,21 @@
 
 {% block content %}
 <div class="container">
-    <h2>Регистрация</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-warning">Зарегистрироваться</button>
-    </form>
-    <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войти</a></p>
+    <div class="col col-md-6 offset-md-3">
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Ошибка!</strong> Проверьте форму на наличие ошибок.
+            </div>
+        {% endif %}
+        <h2>Регистрация</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-warning">Зарегистрироваться</button>
+        </form>
+        <p>Уже есть аккаунт? 
+            <a href="{% url 'login' %}">Войти</a>
+        </p>
+    </div>
 </div>
 {% endblock %}

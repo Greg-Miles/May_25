@@ -175,3 +175,12 @@ MISTRAL_MODERATION_TABLE = {
 
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
+
+
+# Время жизни сессии в секундах (2 минуты)
+SESSION_COOKIE_AGE = 86400
+# Продлевать жизнь сессии при каждом запросе от пользователя
+SESSION_SAVE_EVERY_REQUEST = True
+# (Опционально) Выходить из системы при закрытии браузера
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+ 
