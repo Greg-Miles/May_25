@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.models import User
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 
+custom_user_model = get_user_model()
 
 class UserRegistrationForm(UserCreationForm):
     """
@@ -11,7 +11,7 @@ class UserRegistrationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     
     class Meta:
-        model = User
+        model = custom_user_model
         fields = ('username', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):

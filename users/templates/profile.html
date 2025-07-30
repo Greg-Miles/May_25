@@ -11,6 +11,7 @@
                     <h4>{{ user.username }}</h4>
                     <p><strong>Email:</strong> {{ user.email }}</p>
                     <p><strong>Дата регистрации:</strong> {{ user.date_joined|date:"d.m.Y" }}</p>
+                    <a href="{% url 'password_change' %}" class="btn btn-primary">Изменить пароль</a>
                     
                     {% if is_master %}
                     <div class="alert alert-info">

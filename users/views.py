@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate, get_user_model
+from django.contrib.auth import login, logout, authenticate, get_user_model, get_backends
 
 from django.contrib import messages
 from .forms import UserRegistrationForm, UsernameOrEmailAuthenticationForm
@@ -27,7 +27,8 @@ class RegistrationView(CreateView):
         Обработка валидной формы.
         """
         user = form.save()
-        login(self.request, user)
+        backend = get_backends()[0]  # Получаем первый бэкенд аутентификации
+        login(self.request, user, backend=backend.__module__+ '.' + backend.__class__.__name__)
         return redirect('landing')
 
     
