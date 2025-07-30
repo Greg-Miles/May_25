@@ -44,7 +44,11 @@
                   <a class="nav-link" href="{% url 'profile' %}">Профиль</a>
               </li>
               <li class="nav-item">
-                <a href="{% url 'logout_confirm' %}" class="btn btn-dark btn-outline-warning mt-1">Выход</a>
+                {% comment %} <a href="{% url 'logout_confirm' %}" class="btn btn-dark btn-outline-warning mt-1">Выход</a> {% endcomment %}
+                <form action="{% url 'logout' %}" method="post" id="logout-form">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-warning mt-1" id="logout-btn">Выйти</button>
+                </form>
               </li>
           {% else %}
             {% if request.path != '/users/login/' and request.path != '/users/register/' %}

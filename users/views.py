@@ -67,7 +67,7 @@ class CustomLogoutView(LogoutView):
     Класс представления для выхода пользователя с использованием стандартного LogoutView.
     """
 
-    next_page = 'landing'
+    next_page = 'logout_confirm'
     
 
 

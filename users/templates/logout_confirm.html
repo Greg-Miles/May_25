@@ -4,12 +4,12 @@
 {% block content %}
 <div class="container">
     <div class="col col-md-6 offset-md-3">
-        <h2>Выход</h2>
-        <form action="{% url 'logout' %}" method="post" id="logout-form">
+        <h2>Вы вышли из аккаунта</h2>
+        {% comment %} <form action="{% url 'logout' %}" method="post" id="logout-form">
             {% csrf_token %}
             <p>Вы уверены, что хотите выйти?</p>
             <button type="submit" class="btn btn-danger" id="logout-btn">Выйти</button>
-        </form>
+        </form> {% endcomment %}
 
         <p>
             <a href="{% url 'landing' %}">На главную</a>
