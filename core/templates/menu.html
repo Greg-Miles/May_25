@@ -50,8 +50,8 @@
             {% if request.path != '/users/login/' and request.path != '/users/register/' %}
               <form class="d-flex flex-lg-row flex-column gap-2" method="post" action="{% url 'login' %}">
                 {% csrf_token %}
-                <input type="text" name="username" class="form-control form-control-sm me-2" placeholder="Логин" required>
-                <input type="password" name="password" class="form-control form-control-sm me-2" placeholder="Пароль" required>
+                {{ login_form.username }}
+                {{ login_form.password }}
                 <button type="submit" class="btn btn-sm btn-warning me-2">Войти</button>
                 <a href="{% url 'register' %}" class="btn btn-sm btn-outline-light">Регистрация</a>
               </form>

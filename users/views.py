@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout, authenticate, get_user_model
+
 from django.contrib import messages
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UsernameOrEmailAuthenticationForm
 from core.models import Order, Review
-from django.contrib.auth.models import User
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+
+User = get_user_model()
 
 
 class RegistrationView(CreateView):
@@ -34,7 +36,7 @@ class CustomLoginView(LoginView):
     Класс представления для страницы входа пользователя с использованием стандартного LoginView.
     """
     template_name = 'login.html'
-    authentication_form = AuthenticationForm
+    authentication_form = UsernameOrEmailAuthenticationForm
     redirect_field_name = 'next'
 
     def form_valid(self, form):

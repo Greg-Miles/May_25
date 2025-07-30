@@ -1,5 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+custom_user_model = get_user_model()
 
 # Create your models here.
 
@@ -35,7 +37,7 @@ class Master(models.Model):
     """
     Модель мастера барбершопа.
     """
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='master_profile')
+    user = models.OneToOneField(custom_user_model, on_delete=models.CASCADE, null=True, blank=True, related_name='master_profile')
     name = models.CharField(max_length=100, verbose_name="Имя мастера")
     tag_name = models.CharField(max_length=50, verbose_name='Тег для уведомлений', blank=True)
     photo = models.ImageField(upload_to="masters/", verbose_name="Фото мастера", blank=True)

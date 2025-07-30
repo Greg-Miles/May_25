@@ -70,7 +70,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.page_titles',  # Добавляем наш контекстный процессор
+                'core.context_processors.page_titles',  # Заголовки страниц
+                'core.context_processors.login_form',  # Форма входа
             ],
         },
     },
@@ -108,6 +109,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'users.auth_backend.UsernameOrEmailBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Оставьте для совместимости
+]
+
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/

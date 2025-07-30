@@ -1,4 +1,5 @@
 from django.urls import resolve
+from users.forms import UsernameOrEmailAuthenticationForm
 
 def page_titles(request):
     """
@@ -22,3 +23,6 @@ def page_titles(request):
     page_title = titles.get(url_name, titles['landing'])
     
     return {'page_title': page_title}
+
+def login_form(request):
+    return {'login_form': UsernameOrEmailAuthenticationForm()}
