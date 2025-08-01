@@ -6,7 +6,14 @@ from .forms import UserRegistrationForm, UsernameOrEmailAuthenticationForm
 from core.models import Order, Review
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView, 
+    LogoutView, 
+    PasswordResetView,
+    PasswordResetDoneView, 
+    PasswordResetConfirmView, 
+    PasswordResetCompleteView,
+)
 from django.views.generic import TemplateView, ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
@@ -184,3 +191,44 @@ class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         order.save()
         messages.success(self.request, 'Заказ успешно отменен!')
         return redirect(self.success_url)
+    
+
+class CustomPasswordResetView(PasswordResetView):
+    """
+    Представление для сброса пароля пользователя.
+    """
+    template_name = 'password_reset_form.html'
+    email_template_name = 'password_reset_email.html'
+    success_url = reverse_lazy('password_reset_done')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Инструкции по сбросу пароля отправлены на ваш email.')
+        return super().form_valid(form)
+    
+class CustomPasswordResetDoneView(PasswordResetDoneView):
+    """
+    Представление для страницы успешного сброса пароля.
+    """
+    template_name = 'password_reset_done.html'
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    """
+    Представление для подтверждения сброса пароля.
+    """
+    template_name = 'password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Ваш пароль успешно изменен!')
+        return super().form_valid(form)
+    
+
+class CustomPasswordResetCompleteView(PasswordResetCompleteView):
+    """
+    Представление для завершения сброса пароля.
+    """
+    template_name = 'password_reset_complete.html'
+    
+    def get(self, request, *args, **kwargs):
+        messages.success(request, 'Сброс пароля завершен. Вы можете войти с новым паролем.')
+        return super().get(request, *args, **kwargs)

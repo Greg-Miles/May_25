@@ -100,3 +100,27 @@ class CustomPasswordChangeForm(PasswordChangeForm):
         for field_name, field in self.fields.items():
             field.widget.attrs["class"] = "form-control"
             field.widget.attrs["placeholder"] = field.label or ""
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """
+    Форма для сброса пароля пользователя.
+    """
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Введите ваш Email"}),
+    )
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    """
+    Форма для установки нового пароля после сброса.
+    """
+    new_password1 = forms.CharField(
+        label="Новый пароль",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Новый пароль"}),
+    )
+    new_password2 = forms.CharField(
+        label="Подтверждение нового пароля",
+        widget=forms.PasswordInput(attrs={"class": "form-control", "placeholder": "Подтверждение нового пароля"}),
+    )
+
