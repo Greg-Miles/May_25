@@ -6,7 +6,8 @@ from .views import (
     LogoutConfirmView, 
     CustomLogoutView, 
     UserCancelOrderView, 
-    ProfileView, 
+    ProfileView,
+    UserProfileUpdateView, 
     RegistrationView
 )
 
@@ -18,6 +19,7 @@ urlpatterns = [
     path('logout/', CustomLogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('profile/delete_order/<int:pk>/', UserCancelOrderView.as_view(), name='cancel_order'),
+    path('profile/update/', UserProfileUpdateView.as_view(), name='profile_update'),
     path('password_change/', 
         PasswordChangeView.as_view(
             template_name='password_change.html',

@@ -22,6 +22,11 @@ class RegistrationView(CreateView):
     template_name = 'register.html'
     success_url = reverse_lazy('landing')
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('landing')
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
         """
         Обработка валидной формы.
@@ -29,7 +34,15 @@ class RegistrationView(CreateView):
         user = form.save()
         backend = get_backends()[0]  # Получаем первый бэкенд аутентификации
         login(self.request, user, backend=backend.__module__+ '.' + backend.__class__.__name__)
-        return redirect('landing')
+        messages.success(self.request, f'Добро пожаловать, {user.username}!')
+        return redirect(self.success_url())
+    
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        messages.error(self.request, 'Пожалуйста, исправьте ошибки в форме.')
+        return response
+
+    
 
     
 class CustomLoginView(LoginView):
@@ -39,6 +52,12 @@ class CustomLoginView(LoginView):
     template_name = 'login.html'
     authentication_form = UsernameOrEmailAuthenticationForm
     redirect_field_name = 'next'
+    redirect_authenticated_user = True
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('landing')
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         """
@@ -104,6 +123,22 @@ class ProfileView(LoginRequiredMixin, TemplateView):
             context['orders'] = orders
         
         return context
+    
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    """
+    Представление для обновления профиля пользователя.
+    """
+    model = User
+    fields = ['first_name', 'last_name', 'email']
+    template_name = 'profile_update.html'
+    success_url = reverse_lazy('profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Профиль успешно обновлен!')
+        return super().form_valid(form)
 
 
 class UserCancelOrderView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):

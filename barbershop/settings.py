@@ -111,10 +111,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTHENTICATION_BACKENDS = [
     'users.auth_backend.UsernameOrEmailBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Оставьте для совместимости
+    'django.contrib.auth.backends.ModelBackend',  #Старый бэкенд для совместимости
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -184,8 +187,8 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
-# Время жизни сессии в секундах (2 минуты)
-SESSION_COOKIE_AGE = 86400
+# Время жизни сессии в секундах (неделя)
+SESSION_COOKIE_AGE = 60*60*24*7
 # Продлевать жизнь сессии при каждом запросе от пользователя
 SESSION_SAVE_EVERY_REQUEST = True
 # (Опционально) Выходить из системы при закрытии браузера

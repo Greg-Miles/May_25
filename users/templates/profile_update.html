@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 offset-3">
+
+            <form method="post" class="form-control">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-success">Обновить профиль</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
