@@ -100,6 +100,16 @@ class ProfileView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+
+        fields = []
+        for field in user._meta.get_fields():
+            # Исключаем служебные и связанные поля
+            if field.concrete and not field.many_to_many and not field.one_to_many and field.name not in ['password', 'last_login', 'is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions', 'is_master', 'avatar',]:
+                fields.append({
+                    'verbose_name': field.verbose_name,
+                    'value': getattr(user, field.name)
+                })
+        context['fields'] = fields
         
         # Проверяем, является ли пользователь мастером
         is_master = hasattr(user, 'master_profile')
@@ -129,7 +139,7 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     Представление для обновления профиля пользователя.
     """
     model = User
-    fields = ['first_name', 'last_name', 'email']
+    fields = ['first_name', 'last_name', 'email', 'avatar', 'birth_date', 'telegaram', 'phone']
     template_name = 'profile_update.html'
     success_url = reverse_lazy('profile')
 
