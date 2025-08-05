@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate, get_user_model, get_backends
 
 from django.contrib import messages
-from .forms import UserRegistrationForm, UsernameOrEmailAuthenticationForm
+from .forms import UserRegistrationForm, UsernameOrEmailAuthenticationForm, CustomProfileUpdateForm
 from core.models import Order, Review
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -145,8 +145,9 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     """
     Представление для обновления профиля пользователя.
     """
+    form_class = CustomProfileUpdateForm
     model = User
-    fields = ['first_name', 'last_name', 'email', 'avatar', 'birth_date', 'telegaram', 'phone']
+
     template_name = 'profile_update.html'
     success_url = reverse_lazy('profile')
 

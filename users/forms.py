@@ -67,15 +67,13 @@ class CustomProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = custom_user_model
         fields = ['first_name', 'last_name', 'avatar', 'birth_date', 'telegaram', 'phone']
-        widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'avatar': forms.ClearableFileInput(attrs={'class': 'form-control'}),
-            'birth_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'telegaram': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-        }
+
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs["class"] = "form-control"
+            field.widget.attrs["placeholder"] = field.label or ""
 
     
 class CustomPasswordChangeForm(PasswordChangeForm):

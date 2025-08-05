@@ -1,0 +1,592 @@
+{
+    "type": "database",
+    "name": "db",
+    "objects": [
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_master",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_master\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" varchar(100) NOT NULL, \"photo\" varchar(100) NOT NULL, \"phone\" varchar(20) NOT NULL, \"address\" varchar(255) NOT NULL, \"experience\" integer unsigned NOT NULL CHECK (\"experience\" >= 0), \"is_active\" bool NOT NULL, \"user_id\" bigint NULL UNIQUE REFERENCES \"users_customuser\" (\"id\") DEFERRABLE INITIALLY DEFERRED, \"tag_name\" varchar(50) NOT NULL)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "photo",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "phone",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "address",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "experience",
+                    "type": "integer unsigned",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (\"experience\" >= 0)"
+                        }
+                    ]
+                },
+                {
+                    "name": "is_active",
+                    "type": "bool",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "user_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": null,
+                            "definition": "NULL "
+                        },
+                        {
+                            "type": "UNIQUE",
+                            "definition": "UNIQUE "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"users_customuser\" (\"id\") "
+                        }
+                    ]
+                },
+                {
+                    "name": "tag_name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_master_services",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_master_services\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"master_id\" bigint NOT NULL REFERENCES \"core_master\" (\"id\") DEFERRABLE INITIALLY DEFERRED, \"service_id\" bigint NOT NULL REFERENCES \"core_service\" (\"id\") DEFERRABLE INITIALLY DEFERRED)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "master_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_master\" (\"id\") "
+                        }
+                    ]
+                },
+                {
+                    "name": "service_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_service\" (\"id\") "
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_order",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_order\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"client_name\" varchar(100) NOT NULL, \"phone\" varchar(20) NOT NULL, \"comment\" text NULL, \"status\" varchar(50) NOT NULL, \"date_created\" datetime NOT NULL, \"date_updated\" datetime NOT NULL, \"appointment_date\" datetime NOT NULL, \"master_id\" bigint NULL REFERENCES \"core_master\" (\"id\") DEFERRABLE INITIALLY DEFERRED)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "client_name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "phone",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "comment",
+                    "type": "text",
+                    "constraints": [
+                        {
+                            "type": null,
+                            "definition": "NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "status",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "date_created",
+                    "type": "datetime",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "date_updated",
+                    "type": "datetime",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "appointment_date",
+                    "type": "datetime",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "master_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": null,
+                            "definition": "NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_master\" (\"id\") "
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_order_services",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_order_services\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"order_id\" bigint NOT NULL REFERENCES \"core_order\" (\"id\") DEFERRABLE INITIALLY DEFERRED, \"service_id\" bigint NOT NULL REFERENCES \"core_service\" (\"id\") DEFERRABLE INITIALLY DEFERRED)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "order_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_order\" (\"id\") "
+                        }
+                    ]
+                },
+                {
+                    "name": "service_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_service\" (\"id\") "
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_review",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_review\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"text\" text NOT NULL, \"client_name\" varchar(100) NOT NULL, \"photo\" varchar(100) NULL, \"created_at\" datetime NOT NULL, \"rating\" smallint unsigned NOT NULL CHECK (\"rating\" >= 0), \"is_published\" bool NOT NULL, \"master_id\" bigint NULL REFERENCES \"core_master\" (\"id\") DEFERRABLE INITIALLY DEFERRED, \"ai_checked_status\" varchar(30) NOT NULL)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "text",
+                    "type": "text",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "client_name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "photo",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": null,
+                            "definition": "NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "created_at",
+                    "type": "datetime",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "rating",
+                    "type": "smallint unsigned",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (\"rating\" >= 0)"
+                        }
+                    ]
+                },
+                {
+                    "name": "is_published",
+                    "type": "bool",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "master_id",
+                    "type": "bigint",
+                    "constraints": [
+                        {
+                            "type": null,
+                            "definition": "NULL "
+                        },
+                        {
+                            "type": "FOREIGN KEY",
+                            "definition": "REFERENCES \"core_master\" (\"id\") "
+                        }
+                    ]
+                },
+                {
+                    "name": "ai_checked_status",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "table",
+            "database": null,
+            "name": "core_service",
+            "withoutRowId": false,
+            "strict": false,
+            "ddl": "CREATE TABLE \"core_service\" (\"id\" integer NOT NULL PRIMARY KEY AUTOINCREMENT, \"name\" varchar(200) NOT NULL, \"description\" text NOT NULL, \"price\" decimal NOT NULL, \"duration\" integer unsigned NOT NULL CHECK (\"duration\" >= 0), \"is_popular\" bool NOT NULL)",
+            "columns": [
+                {
+                    "name": "id",
+                    "type": "integer",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "PRIMARY KEY",
+                            "definition": "PRIMARY KEY AUTOINCREMENT"
+                        }
+                    ]
+                },
+                {
+                    "name": "name",
+                    "type": "varchar",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "description",
+                    "type": "text",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "price",
+                    "type": "decimal",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                },
+                {
+                    "name": "duration",
+                    "type": "integer unsigned",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL "
+                        },
+                        {
+                            "type": "CHECK",
+                            "definition": "CHECK (\"duration\" >= 0)"
+                        }
+                    ]
+                },
+                {
+                    "name": "is_popular",
+                    "type": "bool",
+                    "constraints": [
+                        {
+                            "type": "NOT NULL",
+                            "definition": "NOT NULL"
+                        }
+                    ]
+                }
+            ],
+            "rows": [
+            ]
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_master_services_master_id_862debad",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_master_services_master_id_862debad\" ON \"core_master_services\" (\"master_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_master_services_master_id_service_id_5e44882f_uniq",
+            "unique": true,
+            "ddl": "CREATE UNIQUE INDEX \"core_master_services_master_id_service_id_5e44882f_uniq\" ON \"core_master_services\" (\"master_id\", \"service_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_master_services_service_id_3c207aa7",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_master_services_service_id_3c207aa7\" ON \"core_master_services\" (\"service_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_order_master_id_7296ed11",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_order_master_id_7296ed11\" ON \"core_order\" (\"master_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_order_services_order_id_e0482cd7",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_order_services_order_id_e0482cd7\" ON \"core_order_services\" (\"order_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_order_services_order_id_service_id_77e0d812_uniq",
+            "unique": true,
+            "ddl": "CREATE UNIQUE INDEX \"core_order_services_order_id_service_id_77e0d812_uniq\" ON \"core_order_services\" (\"order_id\", \"service_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_order_services_service_id_3305c646",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_order_services_service_id_3305c646\" ON \"core_order_services\" (\"service_id\")"
+        },
+        {
+            "type": "index",
+            "database": null,
+            "name": "core_review_master_id_871c50b7",
+            "unique": false,
+            "ddl": "CREATE INDEX \"core_review_master_id_871c50b7\" ON \"core_review\" (\"master_id\")"
+        }
+    ]
+}
